@@ -6,7 +6,7 @@ Ext.application({
   ],
   controllers: ['Login'],
   models: ['Invitation', 'Form', 'Unit', 'Question', 'Domain', 'Login'],
-  views: ['Registration', 'RegistrationForm', 'Question', 'QuestionFieldSet', 'Summary', 'QuestionSummary', 'Success', 'Failure', 'LoadError', 'NotFound', 'Login'],
+  views: ['Registration', 'RegistrationForm', 'Question', 'Summary', 'QuestionSummary', 'Success', 'Failure', 'LoadError', 'NotFound', 'Login'],
   stores: ['Invitation', 'Form', 'Unit', 'Question', 'Domain'],
 
   icon: {
@@ -29,6 +29,7 @@ Ext.application({
 
   launch: function () {
     /* Overrides due to Chrome 43 */
+    /*
     Ext.override(Ext.util.SizeMonitor, {
       constructor: function (config) {
         var namespace = Ext.util.sizemonitor;
@@ -56,6 +57,7 @@ Ext.application({
         return new Ext.util.paintmonitor.CssAnimation(config);
       }
     });
+    */
     /* Overrrides End */
 
 

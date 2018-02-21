@@ -74,6 +74,7 @@
       {
         xtype: 'fieldset',
         itemId: 'questionfieldset',
+        margin: '25 0 0 0',
         items: []
       },
       {

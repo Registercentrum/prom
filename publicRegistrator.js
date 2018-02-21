@@ -30,10 +30,10 @@ var publicRegistrator = {
     };
   },
   addExtensions: function () {
-    Ext.override('Ext.Picker', {
-      doneButton: 'Klar',
-      cancelButton: 'Avbryt'
-    });
+    // Ext.override('Ext.Picker', {
+    //   doneButton: 'Klar',
+    //   cancelButton: 'Avbryt'
+    // });
 
     Ext.apply(Ext.util.Format, {
       defaultDateFormat: 'd/m/Y'

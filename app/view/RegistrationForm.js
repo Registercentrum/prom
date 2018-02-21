@@ -71,7 +71,7 @@
     title: 'Formulärinmatning',
     id: 'registrationform',
     layout: 'card',
-    fullscreen: true,
+    fullscreen: false,
     margin: 0,
     direction: 'horizontal',
     indicator: false,
