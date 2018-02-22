@@ -1,6 +1,7 @@
 Ext.define('PublicRegistrator.controller.Login', {
   extend: 'Ext.app.Controller',
   alias: 'controller.Login',
+
   config: {
     control: {
       loginButton: {
@@ -22,6 +23,7 @@ Ext.define('PublicRegistrator.controller.Login', {
     },
     isValid: false
   },
+
   validate: function () {
     var form = this.getLoginButton().up();
     var formData = form.getValues();
@@ -36,6 +38,7 @@ Ext.define('PublicRegistrator.controller.Login', {
     this.isValid = validation.length === 0 ? true : false;
     return validation;
   },
+
   onSubjectChange: function () {
     var errors = this.validate();
     var errorLabel = this.getSubjectIdField().up().up().down('#validationMessageSubjectId');
@@ -45,6 +48,7 @@ Ext.define('PublicRegistrator.controller.Login', {
       errorLabel.setData({ validationInfo: '' });
     }
   },
+
   onPinChange: function () {
     var errors = this.validate();
     var errorLabel = this.getSubjectIdField().up().up().down('#validationMessagePinCode');
@@ -56,6 +60,7 @@ Ext.define('PublicRegistrator.controller.Login', {
       errorLabel.setData({ validationInfo: '' });
     }
   },
+
   onLoginClick: function () {
     if (this.isValid) {
       var form = this.getLoginButton().up();
@@ -67,7 +72,6 @@ Ext.define('PublicRegistrator.controller.Login', {
         withCredentials: true,
         method: 'GET',
         success: function (component, data) {
-          console.log(data);
           window.location.assign('/apps/PublicRegistrator/app.html?apikey=' + apikey + '&token=' + data.data);
         },
         failure: function () {

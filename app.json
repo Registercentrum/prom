@@ -4,7 +4,7 @@
     "version": "1.0.0.0",
     "framework": "ext",
     "toolkit": "modern",
-    "theme": "Prom",
+    "theme": "theme-material",
     /**
      * The list of required packages (with optional versions; default is "latest").
      *
@@ -20,7 +20,7 @@
     /**
      * The relative path to the application's markup file (html, jsp, asp, etc.).
      */
-    "indexHtmlPath": "index.html",
+    "indexHtmlPath": "app.html",
     /**
      * Comma-separated string with the paths of directories or files to search. Any classes
      * declared in these locations will be available in your class "requires" or in calls
