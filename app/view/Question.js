@@ -70,6 +70,7 @@
     return this.isValid ? true : this.validationMessage;
   },
   config: {
+    xtype: 'promquestion',
     items: [
       {
         xtype: 'fieldset',

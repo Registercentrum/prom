@@ -1,3 +1,4 @@
 Ext.application({
-  extend: 'PublicRegistrator.Application'
+  extend: 'PublicRegistrator.Application',
+  name: 'PublicRegistrator'
 });

@@ -1,13 +1,14 @@
 ﻿Ext.define('PublicRegistrator.view.Summary', {
   extend: 'Ext.form.Panel',
   requires: [],
-  // xtype: 'summary',
+  alias: 'widget.promsummary',
   presentError: function (message, bn) {
     this.getComponent('saveerror').setData({ message: message });
     bn.enable();
   },
   config: {
     cls: 'prom-summary-panel',
+    xtype: 'promsummary',
     items: [
       {
         xtype: 'button',
