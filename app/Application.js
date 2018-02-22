@@ -19,6 +19,7 @@ Ext.define('PublicRegistrator.Application', {
     if (token !== '') {
       publicRegistrator.init({ token: token, APIKey: apikey, baseURL: baseURL });
     } else {
+      // Ext.Viewport.add(Ext.create('PublicRegistrator.view.Success'));
       Ext.Viewport.add(Ext.create('PublicRegistrator.view.Login'));
     }
   },
