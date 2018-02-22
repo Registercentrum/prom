@@ -12,9 +12,9 @@ Ext.define('PublicRegistrator.Application', {
   launch: function () {
     Ext.fly('appLoadingIndicator').destroy();
 
-    var token = this.getParameterByName('token');
     var baseURL = window.location.hostname;
-    var apikey = !(baseURL === 'rc-utv.rcvg.local' || baseURL === 'demo.registercentrum.se') ? 'r-NYROaDruQ=' : 'Yj0IKgS-VQQ=';
+    var token = this.getParameterByName('token');
+    var apikey = this.getApiKey(baseURL);
 
     if (token !== '') {
       publicRegistrator.init({ token: token, APIKey: apikey, baseURL: baseURL });
@@ -28,5 +28,9 @@ Ext.define('PublicRegistrator.Application', {
     var regex = new RegExp('[\\?&]' + filteredName + '=([^&#]*)', 'i');
     var results = regex.exec(location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  },
+
+  getApiKey(url) {
+    return !(url === 'rc-utv.rcvg.local' || url === 'demo.registercentrum.se') ? 'r-NYROaDruQ=' : 'Yj0IKgS-VQQ=';
   }
 });
