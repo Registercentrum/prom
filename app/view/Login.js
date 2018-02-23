@@ -16,7 +16,7 @@ Ext.define('PublicRegistrator.view.Login', {
         data: {
           validationInfo: ''
         },
-        itemId: 'validationMessageSubjectId',
+        reference: 'validationMessageSubjectId',
         cls: 'summary',
         tpl: '<span class="validationInfo">{validationInfo}</span>'
       },
@@ -25,7 +25,7 @@ Ext.define('PublicRegistrator.view.Login', {
         items: [
           {
             xtype: 'textfield',
-            itemId: 'PersonalId',
+            reference: 'subjectId',
             label: 'Personnummer',
             labelWrap: true,
             name: 'subject',
@@ -33,7 +33,8 @@ Ext.define('PublicRegistrator.view.Login', {
             labelWidth: '60%',
             labelAlign: 'top',
             listeners: {
-              blur: 'onSubjectChange'
+              blur: 'onSubjectChange',
+              action: 'onSubjectChange'
             }
           }
         ]
@@ -43,7 +44,7 @@ Ext.define('PublicRegistrator.view.Login', {
         data: {
           validationInfo: ''
         },
-        itemId: 'validationMessagePinCode',
+        reference: 'validationMessagePinCode',
         cls: 'summary',
         tpl: '<span class="validationInfo">{validationInfo}</span>'
       },
@@ -52,14 +53,15 @@ Ext.define('PublicRegistrator.view.Login', {
         items: [
           {
             xtype: 'textfield',
-            itemId: 'PinCode',
+            reference: 'pinCode',
             name: 'pin',
             label: 'Pinkod',
             placeholder: 'Skriv svar här',
             labelWidth: '60%',
             labelAlign: 'top',
             listeners: {
-              blur: 'onPinChange'
+              blur: 'onPinChange',
+              action: 'onPinChange'
             }
           }
         ]
@@ -67,7 +69,7 @@ Ext.define('PublicRegistrator.view.Login', {
       {
         xtype: 'button',
         text: 'Login',
-        id: 'loginbutton',
+        reference: 'loginButton',
         listeners: {
           tap: 'onLoginClick'
         }
@@ -76,7 +78,7 @@ Ext.define('PublicRegistrator.view.Login', {
         xtype: 'fieldset',
         items: {
           xtype: 'label',
-          itemId: 'missingMessage',
+          reference: 'missingMessage',
           data: {
             message: ''
           },

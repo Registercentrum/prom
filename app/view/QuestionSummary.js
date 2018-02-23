@@ -1,7 +1,7 @@
 ﻿Ext.define('PublicRegistrator.view.QuestionSummary', {
-  requires: ['Ext.Label'],
   extend: 'Ext.Panel',
-  // xtype: 'questionsummary',
+  requires: ['Ext.Label'],
+
   config: {
     cls: 'prom-question-summary',
     items: [

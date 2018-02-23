@@ -2,19 +2,19 @@ Ext.define('PublicRegistrator.model.Login', {
   extend: 'Ext.data.Model',
   fields: [
     {
-      name: 'PersonalId'
+      name: 'subjectid'
     },
     {
-      name: 'PinCode'
+      name: 'pincode'
     }
   ],
   validators: {
-    PersonalId: {
+    subjectid: {
       type: 'format',
       message: 'Ditt personnummer, 12 siffror med streck',
       matcher: /^[0-9]{8}[-][0-9]{4}$/
     },
-    PinCode: {
+    pincode: {
       type: 'format',
       message: 'Pinkoden du fick med fyra siffror',
       matcher: /^[0-9]{4}$/

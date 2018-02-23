@@ -9,8 +9,8 @@ Ext.define('PublicRegistrator.controller.Login', {
 
     var model = Ext.create('PublicRegistrator.model.Login',
       {
-        PersonalId: formData.subject,
-        PinCode: formData.pin
+        subjectid: formData.subject,
+        pincode: formData.pin
       });
 
     var validation = model.getValidation();
@@ -18,22 +18,24 @@ Ext.define('PublicRegistrator.controller.Login', {
   },
 
   onSubjectChange: function () {
-    var validation = this.validate().get('PersonalId');
-    var errorLabel = this.getView().down('#validationMessageSubjectId');
+    var validation = this.validate().get('subjectid');
+    var errorLabel = this.lookup('validationMessageSubjectId');
     if ( validation !== true && this.isReporting) {
       errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
+      this.lookup('pinCode').focus(true);
     }
   },
 
   onPinChange: function () {
-    var validation = this.validate().get('PinCode');
-    var errorLabel = this.getView().down('#validationMessagePinCode');
+    var validation = this.validate().get('pincode');
+    var errorLabel = this.lookup('validationMessagePinCode');
     if ( validation !== true && this.isReporting) {
       errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
+      this.lookup('loginButton').focus(true);
     }
   },
 
@@ -44,7 +46,7 @@ Ext.define('PublicRegistrator.controller.Login', {
     var valid = this.validate().isValid();
     if (valid) {
       var form = this.getView();
-      form.down('#missingMessage').setData({ message: '' });
+      this.lookup('missingMessage').setData({ message: '' });
       var apikey = !(window.location.hostname === 'rc-utv.rcvg.local' || window.location.hostname === 'demo.registercentrum.se') ? 'r-NYROaDruQ=' : 'Yj0IKgS-VQQ=';
       form.submit({
         url: '/api/proxies/survey?apikey=' + apikey,
@@ -55,7 +57,7 @@ Ext.define('PublicRegistrator.controller.Login', {
           window.location.assign('/apps/PublicRegistrator/app.html?apikey=' + apikey + '&token=' + data.data);
         },
         failure: function () {
-          form.down('#missingMessage').setData({ message: 'Vi kan inte hitta någon inbjudan med de uppgifterna.' });
+          this.lookup('missingMessage').setData({ message: 'Vi kan inte hitta någon inbjudan med de uppgifterna.' });
         }
       });
     }
