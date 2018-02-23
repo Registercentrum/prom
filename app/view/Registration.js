@@ -1,17 +1,16 @@
 ﻿Ext.define('PublicRegistrator.view.Registration', {
-  extend: 'Ext.tab.Panel',
-  requires: ['Ext.TitleBar', 'Ext.Carousel', 'Ext.TitleBar'],
+  extend: 'Ext.Panel',
+  requires: ['Ext.TitleBar', 'Ext.Carousel'],
   config: {
-    scrollable: 'vertical',
-    tabBarPosition: 'bottom',
+    layout: 'fit',
     items: [
       {
         xtype: 'regForm'
       },
       {
-        title: 'Formulär',
-        id: 'formTitlebar',
         xtype: 'titlebar',
+        id: 'formTitlebar',
+        title: 'Formulär',
         docked: 'top'
       }
     ]

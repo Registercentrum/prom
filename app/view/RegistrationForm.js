@@ -79,6 +79,16 @@
       xtype: 'tabpanel'
     },
     listeners: {
+      beforeactiveitemchange: function (container, newItem, oldItem) {
+        if (typeof oldItem.validate !== 'undefined') {
+          this.updateAnswer(oldItem);
+          oldItem.validate();
+          if (!oldItem.isValid) {
+            return false;
+          }
+        }
+        return true;
+      },
       'activeitemchange': function (container, newCard, oldCard) {
         var hidden;
         var b = Ext.getCmp('backbutton');
@@ -146,9 +156,7 @@
             handler: function () {
               var rf = Ext.getCmp('registrationform');
               rf.updateAnswer(this.up().up().getActiveItem());
-              if (this.up().up().getActiveItem().xtype !== 'tabpanel' || this.up().up().getActiveItem().validate()) {
-                rf.animateActiveItem(rf.getInnerItems()[rf.getInnerItems().indexOf(rf.getActiveItem()) - 1], { type: 'slide', direction: 'right' });
-              }
+              rf.animateActiveItem(rf.getInnerItems()[rf.getInnerItems().indexOf(rf.getActiveItem()) - 1], { type: 'slide', direction: 'right' });
             }
           },
           {
@@ -163,9 +171,7 @@
             handler: function () {
               var rf = Ext.getCmp('registrationform');
               rf.updateAnswer(this.up().up().getActiveItem());
-              if (this.up().up().getActiveItem().xtype !== 'tabpanel' || this.up().up().getActiveItem().fireEvent('activeitemchange') && this.up().up().getActiveItem().validate()) {
-                rf.setActiveItem(rf.getInnerItems().length, { type: 'slide', direction: 'left' });
-              }
+              rf.setActiveItem(rf.getInnerItems().length, { type: 'slide', direction: 'left' });
             }
           },
           {
@@ -184,9 +190,7 @@
             handler: function () {
               var rf = Ext.getCmp('registrationform');
               rf.updateAnswer(this.up().up().getActiveItem());
-              if (this.up().up().getActiveItem().xtype !== 'tabpanel' || this.up().up().getActiveItem().validate()) {
-                rf.animateActiveItem(rf.getInnerItems()[rf.getInnerItems().indexOf(rf.getActiveItem()) + 1], { type: 'slide', direction: 'left' });
-              }
+              rf.animateActiveItem(rf.getInnerItems()[rf.getInnerItems().indexOf(rf.getActiveItem()) + 1], { type: 'slide', direction: 'left' });
             }
           }
         ]
