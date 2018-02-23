@@ -1,6 +1,7 @@
 Ext.define('PublicRegistrator.controller.Login', {
   extend: 'Ext.app.ViewController',
   alias: 'controller.login',
+  isReporting: false,
 
   validate: function () {
     var form = this.getView();
@@ -19,7 +20,7 @@ Ext.define('PublicRegistrator.controller.Login', {
   onSubjectChange: function () {
     var validation = this.validate().get('PersonalId');
     var errorLabel = this.getView().down('#validationMessageSubjectId');
-    if ( validation !== true) {
+    if ( validation !== true && this.isReporting) {
       errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
@@ -29,7 +30,7 @@ Ext.define('PublicRegistrator.controller.Login', {
   onPinChange: function () {
     var validation = this.validate().get('PinCode');
     var errorLabel = this.getView().down('#validationMessagePinCode');
-    if ( validation !== true) {
+    if ( validation !== true && this.isReporting) {
       errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
@@ -37,6 +38,9 @@ Ext.define('PublicRegistrator.controller.Login', {
   },
 
   onLoginClick: function () {
+    this.isReporting = true;
+    this.onPinChange();
+    this.onSubjectChange();
     var valid = this.validate().isValid();
     if (valid) {
       var form = this.getView();
