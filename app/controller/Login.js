@@ -1,31 +1,9 @@
 Ext.define('PublicRegistrator.controller.Login', {
-  extend: 'Ext.app.Controller',
-  alias: 'controller.Login',
-
-  config: {
-    control: {
-      loginButton: {
-        tap: 'onLoginClick'
-      },
-      subjectIdField: {
-        change: 'onSubjectChange'
-      },
-      pinCodeField: {
-        change: 'onPinChange'
-      }
-    },
-
-    refs: {
-      subjectIdField: 'textfield[name="subject"]',
-      pinCodeField: 'textfield[name="pin"]',
-      loginButton: '#loginbutton',
-      loginView: '#loginview'
-    },
-    isValid: false
-  },
+  extend: 'Ext.app.ViewController',
+  alias: 'controller.login',
 
   validate: function () {
-    var form = this.getLoginButton().up();
+    var form = this.getView();
     var formData = form.getValues();
 
     var model = Ext.create('PublicRegistrator.model.Login',
@@ -34,36 +12,34 @@ Ext.define('PublicRegistrator.controller.Login', {
         PinCode: formData.pin
       });
 
-    var validation = model.validate();
-    this.isValid = validation.length === 0 ? true : false;
+    var validation = model.getValidation();
     return validation;
   },
 
   onSubjectChange: function () {
-    var errors = this.validate();
-    var errorLabel = this.getSubjectIdField().up().up().down('#validationMessageSubjectId');
-    if (errors.items[0] && errors.items[0]._field === 'PersonalId') {
-      errorLabel.setData({ validationInfo: errors.items[0]._message });
+    var validation = this.validate().get('PersonalId');
+    var errorLabel = this.getView().down('#validationMessageSubjectId');
+    if ( validation !== true) {
+      errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
     }
   },
 
   onPinChange: function () {
-    var errors = this.validate();
-    var errorLabel = this.getSubjectIdField().up().up().down('#validationMessagePinCode');
-    if (errors.items[0] && errors.items[0]._field === 'PinCode') {
-      errorLabel.setData({ validationInfo: errors.items[0]._message });
-    } else if (errors.items[1] && errors.items[1]._field === 'PinCode') {
-      errorLabel.setData({ validationInfo: errors.items[1]._message });
+    var validation = this.validate().get('PinCode');
+    var errorLabel = this.getView().down('#validationMessagePinCode');
+    if ( validation !== true) {
+      errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
     }
   },
 
   onLoginClick: function () {
-    if (this.isValid) {
-      var form = this.getLoginButton().up();
+    var valid = this.validate().isValid();
+    if (valid) {
+      var form = this.getView();
       form.down('#missingMessage').setData({ message: '' });
       var apikey = !(window.location.hostname === 'rc-utv.rcvg.local' || window.location.hostname === 'demo.registercentrum.se') ? 'r-NYROaDruQ=' : 'Yj0IKgS-VQQ=';
       form.submit({
@@ -75,7 +51,7 @@ Ext.define('PublicRegistrator.controller.Login', {
           window.location.assign('/apps/PublicRegistrator/app.html?apikey=' + apikey + '&token=' + data.data);
         },
         failure: function () {
-          this.down('#missingMessage').setData({ message: 'Vi kan inte hitta någon inbjudan med de uppgifterna.' });
+          form.down('#missingMessage').setData({ message: 'Vi kan inte hitta någon inbjudan med de uppgifterna.' });
         }
       });
     }

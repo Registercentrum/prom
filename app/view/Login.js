@@ -2,6 +2,8 @@ Ext.define('PublicRegistrator.view.Login', {
   extend: 'Ext.form.Panel',
   config: {
     id: 'loginview',
+    checkChangeEvents: [],
+    controller: 'login',
     padding: '1.2em',
     items: [
       {
@@ -29,7 +31,10 @@ Ext.define('PublicRegistrator.view.Login', {
             name: 'subject',
             placeholder: 'Skriv svar här',
             labelWidth: '60%',
-            labelAlign: 'top'
+            labelAlign: 'top',
+            listeners: {
+              blur: 'onSubjectChange'
+            }
           }
         ]
       },
@@ -47,18 +52,25 @@ Ext.define('PublicRegistrator.view.Login', {
         items: [
           {
             xtype: 'textfield',
+            itemId: 'PinCode',
             name: 'pin',
             label: 'Pinkod',
             placeholder: 'Skriv svar här',
             labelWidth: '60%',
-            labelAlign: 'top'
+            labelAlign: 'top',
+            listeners: {
+              blur: 'onPinChange'
+            }
           }
         ]
       },
       {
         xtype: 'button',
         text: 'Login',
-        id: 'loginbutton'
+        id: 'loginbutton',
+        listeners: {
+          tap: 'onLoginClick'
+        }
       },
       {
         xtype: 'fieldset',
