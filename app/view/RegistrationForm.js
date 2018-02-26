@@ -27,7 +27,6 @@
     var input;
     var name;
 
-    // sätt värde från den tab som lämnas till Current
     fieldset = oldCard.getComponent('questionfieldset');
 
     if (typeof fieldset !== 'undefined') {
@@ -35,19 +34,13 @@
     }
 
     if (typeof field !== 'undefined') {
-      // hämta värde
       var value = field.getValue();
-
-      // städa
       value = value !== '' ? value : null;
 
-      // fixa till datum till rätt format
-      if (value !== null) {
-        if (typeof value.yyyymmdd !== 'undefined') {
-          value = value.yyyymmdd();
-        }
+      if (value !== null && value instanceof Date) {
+        value = value.toLocaleDateString('sv-SE');
       }
-      // behöver uppdatera värden även här om defaultvärde finns
+      
       name = field.getName();
       Current[name] = value;
 

@@ -1,7 +1,7 @@
 Ext.define('PublicRegistrator.controller.Login', {
   extend: 'Ext.app.ViewController',
   alias: 'controller.login',
-  isReporting: false,
+  showInstantValidation: false,
 
   validate: function () {
     var form = this.getView();
@@ -20,7 +20,17 @@ Ext.define('PublicRegistrator.controller.Login', {
   onSubjectChange: function () {
     var validation = this.validate().get('subjectid');
     var errorLabel = this.lookup('validationMessageSubjectId');
-    if ( validation !== true && this.isReporting) {
+    this.displayValidation(validation, errorLabel);
+  },
+
+  onPinChange: function () {
+    var validation = this.validate().get('pincode');
+    var errorLabel = this.lookup('validationMessagePinCode');
+    this.displayValidation(validation, errorLabel);
+  },
+
+  displayValidation(validation, errorLabel) {
+    if ( validation !== true && this.showInstantValidation) {
       errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
@@ -28,19 +38,8 @@ Ext.define('PublicRegistrator.controller.Login', {
     }
   },
 
-  onPinChange: function () {
-    var validation = this.validate().get('pincode');
-    var errorLabel = this.lookup('validationMessagePinCode');
-    if ( validation !== true && this.isReporting) {
-      errorLabel.setData({ validationInfo: validation });
-    } else {
-      errorLabel.setData({ validationInfo: '' });
-      this.lookup('loginButton').focus(true);
-    }
-  },
-
   onLoginClick: function () {
-    this.isReporting = true;
+    this.showInstantValidation = true;
     this.onPinChange();
     this.onSubjectChange();
     var valid = this.validate().isValid();

@@ -2,7 +2,6 @@
 var publicRegistrator = {
   init: function (config) {
     this.config = config;
-    this.addHelpers();
     this.addExtensions();
     this.initInvitation(this.buildForm);
   },
@@ -20,15 +19,7 @@ var publicRegistrator = {
       callback(self);
     });
   },
-  addHelpers: function () {
-    Date.prototype.yyyymmdd = function () {
-      var yyyy = this.getFullYear().toString();
-      var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
-      var dd = this.getDate().toString();
 
-      return yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
-    };
-  },
   addExtensions: function () {
     // Ext.override('Ext.Picker', {
     //   doneButton: 'Klar',
@@ -44,55 +35,38 @@ var publicRegistrator = {
   buildForm: function (self) {
     var i = 0;
     var n;
-    var appMetaForm = [];// metadata used in this App
+    var appMetaForm = [];
     var invitation = self.invitationStore.getAt(0);
-    var replyStatus;
+    var errorMessage;
 
-    // formulär saknas
-    /*
-            if (invitation == undefined) {
-                Ext.Viewport.add(Ext.create('PublicRegistrator.view.Login'));
-                return;
-            }
-            */
+    var replyStatus = invitation.get('ReplyStatus');
 
-    // Set initalvalues if applicable
+    if (replyStatus === 100) {
+      errorMessage = 'Detta formulär har redan besvarats.';
+    }
+
+    if (replyStatus === 110) {
+      errorMessage = 'Denna formulärinbjudan är avbruten.';
+    }
+
+    if (replyStatus === 99) {
+      errorMessage = 'Denna formulärinbjudan har utgått.';
+    }
+
+    if (!errorMessage && invitation.get('IsOngoing') === false) {
+      errorMessage = 'Detta formulär är inte längre aktuellt.';
+    }
+
+    if (errorMessage) {
+      var p = Ext.create('PublicRegistrator.view.Message');
+      p.getComponent('title').setTitle('Fel vid hämtning av formulär');
+      p.getComponent('message').setData({message: errorMessage});
+      Ext.Viewport.add(p);
+      return;
+    }
+
     if (invitation.data.Initials) {
       Current = invitation.data.Initials;
-    }
-
-    replyStatus = invitation.get('ReplyStatus');
-
-    // "Redan besvarat"
-    if (replyStatus == 100) {
-      var p = Ext.create('PublicRegistrator.view.LoadError');
-      p.getComponent('message').setData({ message: 'Detta formulär har redan besvarats.' });
-      Ext.Viewport.add(p);
-      return;
-    }
-
-    // "Avbrutet"
-    if (replyStatus == 110) {
-      var p = Ext.create('PublicRegistrator.view.LoadError');
-      p.getComponent('message').setData({ message: 'Denna formulärinbjudan är avbruten.' });
-      Ext.Viewport.add(p);
-      return;
-    }
-
-    // "Utgått"
-    if (replyStatus == 99) {
-      var p = Ext.create('PublicRegistrator.view.LoadError');
-      p.getComponent('message').setData({ message: 'Denna formulärinbjudan har utgått.' });
-      Ext.Viewport.add(p);
-      return;
-    }
-
-    // "Inte längre aktuell"
-    if (invitation.get('IsOngoing') == false) {
-      var p = Ext.create('PublicRegistrator.view.LoadError');
-      p.getComponent('message').setData({message: 'Detta formulär är inte längre aktuellt.'});
-      Ext.Viewport.add(p);
-      return;
     }
 
     self.formStore.setData([invitation.get('Form')]);
@@ -248,9 +222,8 @@ var publicRegistrator = {
 
     var updateMyValue = function () {
       var v = this.getValue();
-      // fixa till datum till rätt format
-      if (v != null) {
-        if (v.yyyymmdd != undefined) {v = v.yyyymmdd();}
+      if (v instanceof Date) {
+        v = v.toLocaleDateString('sv-SE');
       }
 
       Current[columnName] = v;
