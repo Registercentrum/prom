@@ -2,10 +2,7 @@
   extend: 'Ext.form.Panel',
   requires: [],
   alias: 'widget.promsummary',
-  presentError: function (message, bn) {
-    this.getComponent('saveerror').setData({ message: message });
-    bn.enable();
-  },
+
   config: {
     cls: 'prom-summary-panel',
     xtype: 'promsummary',
@@ -14,48 +11,9 @@
         xtype: 'button',
         cls: 'prom-submit-answers',
         id: 'bnSend',
-        // ui: 'confirm',
         disabled: true,
         text: 'Skicka in dina svar',
-        handler: function () {
-          var summary = this.getParent();
-          var bn = this;
-
-          // inaktivera knapp för att hindra "dubbelanrop"
-          // knapp aktiveras igen om felmeddelande visas
-          bn.disable();
-
-          Ext.Ajax.request({
-            url: '//' + publicRegistrator.config.baseURL + '/api/registrations', // ?apikey=' + publicRegistrator.config.APIKey,
-            params: {
-              apikey: publicRegistrator.config.APIKey,
-              Token: publicRegistrator.config.token
-            },
-            jsonData: Current,
-            success: function (r) {
-              var response = Ext.decode(r.responseText);
-              if (response.success) {
-                var p = Ext.create('PublicRegistrator.view.Success');
-                Ext.Viewport.add(p);
-                Ext.Viewport.setActiveItem(p);
-              } else {
-                summary.presentError(response, bn);
-              }
-            },
-            failure: function (r) {
-              var response = Ext.decode(r.responseText);
-              if (!response.success) {
-                if (response.message === null) {
-                  var p = Ext.create('PublicRegistrator.view.Failure');
-                  Ext.Viewport.add(p);
-                  Ext.Viewport.setActiveItem(p);
-                } else {
-                  summary.presentError(response.message, bn);
-                }
-              }
-            }
-          });
-        }
+        handler: function () { this.up().onButtonClick(this);}
       },
       {
         xtype: 'label',
@@ -65,16 +23,57 @@
       },
       {
         xtype: 'fieldset',
-        //  title: 'Sammanställning',
         id: 'summaryFieldset',
         itemId: 'summaryFieldset',
-        // instructions: 'Sammanställning',
         cls: 'summary',
-        defaults: {
-          // labelalign: 'top'
-        },
         items: []
       }
     ]
+  },
+
+  onButtonClick: function (bn) {
+    var summary = this;
+    bn.disable();
+
+    Ext.Ajax.request({
+      url: '//' + publicRegistrator.config.baseURL + '/api/registrations', // ?apikey=' + publicRegistrator.config.APIKey,
+      params: {
+        apikey: publicRegistrator.config.APIKey,
+        Token: publicRegistrator.config.token
+      },
+      jsonData: Current,
+      success: function (r) {
+        var response = Ext.decode(r.responseText);
+        if (response.success) {
+          summary.presentThanks();
+        } else {
+          summary.presentError(response, bn);
+        }
+      },
+      failure: function (r) {
+        var response = Ext.decode(r.responseText);
+        if (!response.success) {
+          if (response.message === null) {
+            summary.presentThanks();
+          } else {
+            summary.presentError(response.message, bn);
+          }
+        }
+      }
+    });
+  },
+
+  presentError: function (message, bn) {
+    this.getComponent('saveerror').setData({ message: message });
+    bn.enable();
+  },
+
+  presentThanks: function () {
+    var message = '<h1>Tack för din hjälp!</h1><div>Dina svar hjälper oss göra vården bättre och vi uppskattar att du tog dig tid att svara på enkäten.</div>';
+    var messageView = Ext.create('PublicRegistrator.view.Message');
+    messageView.getComponent('title').setTitle('Tack');
+    messageView.getComponent('message').setData({ message: message });
+    Ext.Viewport.add(messageView);
+    Ext.Viewport.setActiveItem(messageView);
   }
 });

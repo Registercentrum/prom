@@ -40,7 +40,7 @@
       if (value !== null && value instanceof Date) {
         value = value.toLocaleDateString('sv-SE');
       }
-      
+
       name = field.getName();
       Current[name] = value;
 

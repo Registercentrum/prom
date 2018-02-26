@@ -5,41 +5,81 @@ var publicRegistrator = {
     this.addExtensions();
     this.initInvitation(this.buildForm);
   },
+  addExtensions: function () {
+    Ext.util.Format.decimalSeparator = ',';
+  },
   initInvitation: function (callback) {
     var self = this;
 
-    self.formStore = Ext.getStore('Form');
-    self.unitStore = Ext.getStore('Unit');
-    self.invitationStore = Ext.getStore('Invitation');
-    self.questionStore = Ext.getStore('Question');
-    self.domainStore = Ext.getStore('Domain');
+    self.formStore        = Ext.getStore('Form');
+    self.unitStore        = Ext.getStore('Unit');
+    self.questionStore    = Ext.getStore('Question');
+    self.domainStore      = Ext.getStore('Domain');
+    self.invitationStore  = Ext.getStore('Invitation');
 
     self.invitationStore.setUrlByToken();
     self.invitationStore.load(function () {
       callback(self);
     });
   },
-
-  addExtensions: function () {
-    // Ext.override('Ext.Picker', {
-    //   doneButton: 'Klar',
-    //   cancelButton: 'Avbryt'
-    // });
-
-    Ext.apply(Ext.util.Format, {
-      defaultDateFormat: 'd/m/Y'
-    });
-
-    Ext.util.Format.decimalSeparator = ',';
-  },
   buildForm: function (self) {
-    var i = 0;
-    var n;
     var appMetaForm = [];
     var invitation = self.invitationStore.getAt(0);
-    var errorMessage;
 
+    self.handleInvitationErrors(invitation);
+
+    if (invitation.data.Initials) {
+      Current = invitation.data.Initials;
+    }
+
+    self.formStore.setData([invitation.get('Form')]);
+    self.unitStore.setData([invitation.get('Unit')]);
+
+    var form = self.formStore.getAt(0);
+
+    self.questionStore.setData(form.get('Questions'));
+
+    var registration    = Ext.create('PublicRegistrator.view.Registration');
+    var summary         = Ext.create('PublicRegistrator.view.Summary');
+    var summaryFieldset = summary.getComponent('summaryFieldset');
+    var formView        = Ext.getCmp('registrationform');
+    var formTitlebar    = Ext.getCmp('formTitlebar');
+
+    formTitlebar.setTitle(invitation.get('Form').FormTitle);
+
+    self.questionStore.filterBy(function (question) {
+      var mappedTo = question.get('MappedTo');
+      if (mappedTo === null || mappedTo === 'EventDate') {
+        return true;
+      }
+      return false;
+    });
+
+    var numberOfQuestions = self.questionStore.getCount();
+    var i = 0;
+    self.questionStore.each(function (question) {
+      i++;
+
+      if (question.data.Domain.DomainID === 1044) {
+        var pnInfo = self.buildInfoPanel(self.getVASInfo(i, numberOfQuestions));
+        formView.add(pnInfo);
+      }
+
+      var pnQuestion = self.buildQuestion(question, i, numberOfQuestions, appMetaForm, self);
+      formView.add(pnQuestion);
+
+      var pnQuestionSummary = self.buildSummaryField(question, i, appMetaForm);
+      summaryFieldset.add(pnQuestionSummary);
+    });
+
+    formView.add(summary);
+    Ext.Viewport.add(registration);
+
+    controlFunction();
+  },
+  handleInvitationErrors(invitation) {
     var replyStatus = invitation.get('ReplyStatus');
+    var errorMessage;
 
     if (replyStatus === 100) {
       errorMessage = 'Detta formulär har redan besvarats.';
@@ -58,90 +98,21 @@ var publicRegistrator = {
     }
 
     if (errorMessage) {
-      var p = Ext.create('PublicRegistrator.view.Message');
-      p.getComponent('title').setTitle('Fel vid hämtning av formulär');
-      p.getComponent('message').setData({message: errorMessage});
-      Ext.Viewport.add(p);
+      var messageView = Ext.create('PublicRegistrator.view.Message');
+      messageView.getComponent('title').setTitle('Fel vid hämtning av formulär');
+      messageView.getComponent('message').setData({message: errorMessage});
+      Ext.Viewport.add(messageView);
       return;
     }
-
-    if (invitation.data.Initials) {
-      Current = invitation.data.Initials;
-    }
-
-    self.formStore.setData([invitation.get('Form')]);
-    self.unitStore.setData([invitation.get('Unit')]);
-
-    var form = self.formStore.getAt(0);
-    var unit = self.unitStore.getAt(0);
-
-    self.questionStore.setData(form.get('Questions'));
-
-    var reg = Ext.create('PublicRegistrator.view.Registration');
-    var summary = Ext.create('PublicRegistrator.view.Summary');
-    var summaryFieldset = summary.getComponent('summaryFieldset');
-
-    formTitlebar = Ext.getCmp('formTitlebar');
-    formTitlebar.setTitle(invitation.get('Form').FormTitle);
-    pnReg = Ext.getCmp('registrationform');
-
-    self.questionStore.filterBy(function (q) {
-      var mappedTo = q.get('MappedTo');
-      var domain = q.get('Domain');
-
-      // if (domain.DomainID == 1080) //"sektion" - skall inte bli en fråga
-      //    return;
-      // if (domain.DomainID != 1044) //"sektion" - skall inte bli en fråga
-      //    return;
-
-      if (mappedTo == null) {return q;}
-
-      switch (mappedTo) // skall endast hantera EventDate
-      {
-      case 'EventDate':
-        return q;
-        break;
-      }
-    });
-
-    n = self.questionStore.getCount();
-
-    self.questionStore.each(function (q) {
-      i++;
-
-      // add infopanel to VAS-scale
-      if (q.data.Domain.DomainID === 1044) {
-        var pnInfo = self.buildInfoPanel(self.getVASInfo(i, n));
-        pnReg.add(pnInfo);
-      }
-
-      // add question to tabpanel
-      var pnQuestion = self.buildQuestion(q, i, n, appMetaForm, self, form.data.FormID);
-      pnReg.add(pnQuestion);
-
-      // add question to summary
-      var pnQuestionSummary = self.buildSummaryField(q, i, n, appMetaForm);
-      summaryFieldset.add(pnQuestionSummary);
-    });
-
-    pnReg.add(summary);
-
-    panel = Ext.Viewport.add(reg);
-
-    // kör controlskript först en gång
-    controlFunction();
   },
-  buildSummaryField: function (q, i, n, appMetaForm) {
-    var pn = Ext.create('PublicRegistrator.view.QuestionSummary');
-    pn.setItemId(q.get('ColumnName'));//
-    pn.getComponent('header').setData({
+  buildSummaryField: function (question, i, appMetaForm) {
+    var summary = Ext.create('PublicRegistrator.view.QuestionSummary');
+    summary.setItemId(question.get('ColumnName'));
+    summary.getComponent('header').setData({
       questionNo: i + '. ' + appMetaForm[ i - 1].questionText
     });
-    // pn.getComponent('summaryQuestion').setData({
-    //   questionText: appMetaForm[i - 1].questionText
-    // });
 
-    return pn;
+    return summary;
   },
   buildQuestionText: function (q) {
     var ret;
@@ -199,42 +170,61 @@ var publicRegistrator = {
 
     return pn;
   },
-  buildQuestion: function (q, i, n, m, self, formID) {
-    var f;
-    var pn = Ext.create('PublicRegistrator.view.Question');
-    // var pnButton = Ext.create('PublicRegistrator.view.ButtonPanel');
-    var qf = pn.getComponent('questionfieldset').setTitle('Fråga ' + i + ' av ' + n);
-    var d = q.get('Domain');
-    var questionText = self.buildQuestionText(q);
-    var columnName = q.get('ColumnName');
-    pn.isMandatory = q.get('IsMandatory');
-    var cs = q.get('ControlScript');
-    var vs = q.get('ValidationScript');
+  buildQuestion: function (question, i, numberOfQuestions, meta, self) {
+    var field;
+    var view = Ext.create('PublicRegistrator.view.Question');
+    var fieldset = view.getComponent('questionfieldset');
+    fieldset.setTitle('Fråga ' + i + ' av ' + numberOfQuestions);
 
-    pn.setItemId(columnName);//
-    pn.domainID = d.DomainID;
+    var questionText = self.buildQuestionText(question);
+    var domain           = question.get('Domain');
+    var columnName       = question.get('ColumnName');
+    var controlScript    = question.get('ControlScript');
+    var validationScript = question.get('ValidationScript');
+    view.isMandatory     = question.get('IsMandatory');
 
-    m.push({
+    view.setItemId(columnName);
+    view.domainID = domain.DomainID;
+
+    meta.push({
       questionNo: i,
       questionText: questionText,
       columnName: columnName
     });
 
     var updateMyValue = function () {
-      var v = this.getValue();
-      if (v instanceof Date) {
-        v = v.toLocaleDateString('sv-SE');
+      var value = this.getValue();
+      if (value instanceof Date) {
+        value = value.toLocaleDateString('sv-SE');
       }
+      Current[columnName] = value;
+    };
 
-      Current[columnName] = v;
-    };
     var validateMe = function () {
-      if(this.getParent()){
-        var q = this.getParent().getParent();
-        var answer = q.validate();
-        return answer;
-      } else return true;
+      if (this.getParent()) {
+        var form = this.up().up();
+        var isValid = form.validate();
+        return isValid;
+      }
+      return true;
     };
+
+    if (controlScript !== null) {
+      if (controlScript.indexOf('Parent') === -1) {
+        var cf = new Function(controlScript); // eslint-disable-line no-new-func
+        controlFunctions.push(cf);
+      }
+    }
+
+    if (validationScript !== null) {
+      if (validationScript.indexOf('Parent') === -1) {
+        var vf = new Function(validationScript); // eslint-disable-line no-new-func
+        validationFunctions.push({
+          columnName: columnName,
+          validationFunction: vf
+        });
+      }
+    }
 
     // DomainID	DomainName	DomainTitle	IsInteger	RegisterID
     // 1015	Boolean	Boolesk	0	NULL
@@ -251,33 +241,16 @@ var publicRegistrator = {
     // 1052	Decimal2	Decimaltal2	0	NULL
     // 1053	Decimal3	Decimaltal3	0	NULL
 
-    if (cs != null) {
-      if (cs.indexOf('Parent') == -1) {
-        var fn = new Function(cs);
-        controlFunctions.push(fn);
-      }
-    }
-    if (vs != null) {
-      if (vs.indexOf('Parent') == -1) {
-        var fn = new Function(vs);
-        validationFunctions.push({
-          columnName: columnName,
-          validationFunction: fn
-        });
-      }
-    }
-
-    // fråga har domänvärden
-    if (d.IsEnumerated) {
+    if (domain.IsEnumerated) {
       var store = Ext.create('PublicRegistrator.store.Domain');
-      store.setDomainUrl(d.DomainID);
+      store.setDomainUrl(domain.DomainID);
       store.load(function () {
         /*
-                    var qOptions = [{
-                      text: '',
-                      value: ''
-                    }];
-                    */
+        var qOptions = [{
+          text: '',
+          value: ''
+        }];
+        */
         var qOptions = [];
         var radios = document.createElement('div');
         var dv = store.getAt(0).getData().DomainValues;
@@ -285,9 +258,9 @@ var publicRegistrator = {
 
         // This array contains all the DomainIDs that will render as radiobuttons
         var EQ5DQuestions = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
-        var isEQ5DQuestion = EQ5DQuestions.indexOf(parseInt(d.DomainID)) !== -1;
+        var isEQ5DQuestion = EQ5DQuestions.indexOf(parseInt(domain.DomainID, 10)) !== -1;
         if (isEQ5DQuestion) {
-          f = Ext.create('Ext.field.Field', {
+          field = Ext.create('Ext.field.Field', {
             itemId: 'question',
             cls: 'prom-radio',
             html: radios,
@@ -299,65 +272,55 @@ var publicRegistrator = {
             labelAlign: 'top'
           });
         }
-        for (var i = 0; i < dv.length; i++) {
+
+        var onRadioclick = function () {
+          var input = document.querySelector('input[name="' + columnName + '"]:checked');
+          Array.prototype.map.call(document.querySelectorAll('input[name="' + columnName + '"]'), function (node) {
+            node.parentNode.className = '';
+          });
+          if (input.value === field.getValue()) {
+            input.checked = false;
+            field.setValue(null);
+          } else {
+            field.setValue(input.value);
+            input.parentNode.className = 'checked';
+          }
+
+          updateMyValue.bind(field)();
+          controlFunction();
+          validationFunction.bind(field)();
+          validateMe.bind(field)();
+        };
+
+        for (var j = 0; j < dv.length; j++) {
           // Store a map of all ValueCodes to ValueName for summary
-          NameMap[columnName][dv[i].ValueCode] = dv[i].ValueName;
-          if (dv[i].IsActive) {
+          NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
+          if (dv[j].IsActive) {
             // only create costum radiobuttons for questionIds in EQ5DQuestions
             if (isEQ5DQuestion) {
-              /*
-                            f = Ext.create('Ext.field.Field', {
-                              itemId: 'question',
-                              html: radios,
-                              label: questionText,
-                              labelWrap: true,
-                              placeholder: 'Skriv in ett decimaltal, 3 decimaler',
-                              name: columnName,
-                              labelWidth: '60%',
-                              labelAlign: 'top'
-                            });
-                            */
               var label = document.createElement('label');
-              var text = document.createElement('p');
-              label.innerHTML = dv[i].ValueName;
-              radio = document.createElement('input');
+              label.innerHTML = dv[j].ValueName;
+              var radio = document.createElement('input');
               radio.setAttribute('type', 'radio');
               radio.setAttribute('name', columnName);
-              radio.setAttribute('value', dv[i].ValueCode);
-              radio.onclick = function () {
-                var input = document.querySelector('input[name="' + columnName + '"]:checked');
-                Array.prototype.map.call(document.querySelectorAll('input[name="' + columnName + '"]'), function (i) {
-                  i.parentNode.className = '';
-                });
-                if (input.value == f.getValue()) {
-                  input.checked = false;
-                  f.setValue(null);
-                } else {
-                  f.setValue(input.value);
-                  input.parentNode.className = 'checked';
-                }
-
-                updateMyValue.bind(f)();
-                controlFunction();
-                validationFunction.bind(f)();
-                validateMe.bind(f)();
-              };
+              radio.setAttribute('value', dv[j].ValueCode);
+              radio.onclick = onRadioclick;
               label.appendChild(radio);
               radios.appendChild(label);
-              if (i != dv.length) {
+              if (j !== dv.length) {
                 radios.appendChild(document.createElement('hr'));
               }
               // If the question isn't in EQ5DQuestions then we show the old select menu.
             } else {
               qOptions.push({
-                text: dv[i].ValueName,
-                value: dv[i].ValueCode
+                text: dv[j].ValueName,
+                value: dv[j].ValueCode
               });
             }
           }
         }
         if (!isEQ5DQuestion) {
-          f = Ext.create('Ext.field.Select', {
+          field = Ext.create('Ext.field.Select', {
             itemId: 'question',
             label: questionText,
             labelWrap: true,
@@ -369,16 +332,16 @@ var publicRegistrator = {
           });
         }
 
-        f.on('change', updateMyValue, f, {});
-        f.on('change', controlFunction, this, {});
-        f.on('change', validateMe, f, {});
+        field.on('change', updateMyValue, field, {});
+        field.on('change', controlFunction, this, {});
+        field.on('change', validateMe, field, {});
 
-        qf.add(f);
+        fieldset.add(field);
       });
     } else {
       switch (true) {
-      case (d.DomainID == 1015): // Boolean
-        f = Ext.create('Ext.field.Toggle', {
+      case (domain.DomainID === 1015): // Boolean
+        field = Ext.create('Ext.field.Toggle', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -387,19 +350,8 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1020): // Text
-        f = Ext.create('Ext.field.Text', {
-          itemId: 'question',
-          label: questionText,
-          labelWrap: true,
-          name: columnName,
-          placeholder: 'Skriv svar här',
-          labelWidth: '60%',
-          labelAlign: 'top'
-        });
-        break;
-      case (d.DomainID == 1021): // Kommentar
-        f = Ext.create('Ext.field.TextArea', {
+      case (domain.DomainID === 1020): // Text
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -409,8 +361,19 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1030): // Datum
-        f = Ext.create('Ext.field.DatePicker', {
+      case (domain.DomainID === 1021): // Kommentar
+        field = Ext.create('Ext.field.TextArea', {
+          itemId: 'question',
+          label: questionText,
+          labelWrap: true,
+          name: columnName,
+          placeholder: 'Skriv svar här',
+          labelWidth: '60%',
+          labelAlign: 'top'
+        });
+        break;
+      case (domain.DomainID === 1030): // Datum
+        field = Ext.create('Ext.field.DatePicker', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -432,8 +395,8 @@ var publicRegistrator = {
           }
         });
         break;
-      case (d.DomainID == 1033): // Tid
-        f = Ext.create('Ext.field.Text', {
+      case (domain.DomainID === 1033): // Tid
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -443,8 +406,8 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1038): // Årtal
-        f = Ext.create('Ext.field.Number', {
+      case (domain.DomainID === 1038): // Årtal
+        field = Ext.create('Ext.field.Number', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -456,21 +419,21 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1040): // heltal
-        f = Ext.create('Ext.field.Number', {
+      case (domain.DomainID === 1040): // heltal
+        field = Ext.create('Ext.field.Number', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
           placeholder: 'Skriv in ett heltal',
           name: columnName,
           labelWidth: '60%',
-          labelAlign: 'top',
+          labelAlign: 'top'
           // errorTarget: 'under'
           // validators: function (value) { if (this.isBlurring()) { /*updateMyValue.call(f); return validateMe.call(f);*/} else { return true;} }
         });
         break;
-      case (d.DomainID == 1050): // flyttal
-        f = Ext.create('Ext.field.Text', {
+      case (domain.DomainID === 1050): // flyttal
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -480,8 +443,8 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1051): // decimaltal 1 decimal
-        f = Ext.create('Ext.field.Text', {
+      case (domain.DomainID === 1051): // decimaltal 1 decimal
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -491,8 +454,8 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1052): // decimaltal 2 decimal
-        f = Ext.create('Ext.field.Text', {
+      case (domain.DomainID === 1052): // decimaltal 2 decimal
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -502,8 +465,8 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1053): // decimaltal 3 decimal
-        f = Ext.create('Ext.field.Text', {
+      case (domain.DomainID === 1053): // decimaltal 3 decimal
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
@@ -513,8 +476,8 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1044): // vas
-        f = Ext.create('Ext.field.Field', {
+      case (domain.DomainID === 1044): // vas
+        field = Ext.create('Ext.field.Field', {
           itemId: 'question',
           html: publicRegistrator.vas(columnName),
           label: questionText,
@@ -525,33 +488,32 @@ var publicRegistrator = {
           labelAlign: 'top'
         });
         break;
-      case (d.DomainID == 1080): // Labels
+      case (domain.DomainID === 1080): // Labels
         break;
       default:
-        f = Ext.create('Ext.field.Text', {
+        field = Ext.create('Ext.field.Text', {
           itemId: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
-          placeholder: 'Skriv in ' + d.DomainTitle,
+          placeholder: 'Skriv in ' + domain.DomainTitle,
           labelWidth: '60%',
           labelAlign: 'top'
         });
         break;
       }
 
-      f.on('change', updateMyValue, f, {});
-      f.on('change', controlFunction, this, {});
-      f.on('change', validateMe, f, {});
+      field.on('change', updateMyValue, field, {});
+      field.on('change', controlFunction, this, {});
+      field.on('change', validateMe, field, {});
 
-      qf.add(f);
+      fieldset.add(field);
     }
     Current[columnName] = null;
 
-    pn.add(qf);
-    return pn;
+    view.add(fieldset);
+    return view;
   },
-  // Creates the lines for Vas scale and appends the onClick handler
   vasScale: function (columnName) {
     var changeValue = publicRegistrator.changeFieldValue(columnName);
     var scaleThermometer = document.createElement('div');
@@ -561,9 +523,9 @@ var publicRegistrator = {
       var line = document.createElement('div');
       line.className = 'line';
       clickable.className = 'clickableLine';
-      clickable.style.margin = (i % 10 == 0 ? '1px' : 0) + ' 0';
-      line.style.width = i % 10 == 0 ? '30px' : '15px';
-      line.style.height =  i % 10 == 0 ? '3px' : '1px';
+      clickable.style.margin = (i % 10 === 0 ? '1px' : 0) + ' 0';
+      line.style.width = i % 10 === 0 ? '30px' : '15px';
+      line.style.height =  i % 10 === 0 ? '3px' : '1px';
       clickable.onclick = changeValue(i);
       clickable.id = i;
       clickable.appendChild(line);

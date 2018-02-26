@@ -12,7 +12,8 @@
       {
         xtype: 'panel',
         itemId: 'message',
-        tpl: '<h2>{message}</h2>'
+        cls: 'prom-message',
+        tpl: '{message}'
       }
     ]
   }

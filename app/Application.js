@@ -7,7 +7,7 @@ Ext.define('PublicRegistrator.Application', {
   viewcontrollers: ['Login'],
   models: ['Invitation', 'Form', 'Unit', 'Question', 'Domain', 'Login'],
   stores: ['Invitation', 'Form', 'Unit', 'Question', 'Domain'],
-  views: ['Registration', 'RegistrationForm', 'Question', 'Summary', 'QuestionSummary', 'Success', 'Failure', 'Message', 'Login'],
+  views: ['Registration', 'RegistrationForm', 'Question', 'Summary', 'QuestionSummary', 'Message', 'Login'],
 
   launch: function () {
     Ext.fly('appLoadingIndicator').destroy();
