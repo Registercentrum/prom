@@ -1,9 +1,9 @@
-﻿Ext.define('PublicRegistrator.view.Registration', {
+﻿Ext.define('PublicRegistrator.view.Survey', {
   extend: 'Ext.Panel',
   requires: ['Ext.TitleBar', 'Ext.Carousel'],
   config: {
     layout: 'fit',
-    controller: 'form',
+    controller: 'survey',
     items: [
       {
         xtype: 'carousel',

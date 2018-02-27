@@ -2,12 +2,12 @@ Ext.define('PublicRegistrator.Application', {
   extend: 'Ext.app.Application',
   name: 'PublicRegistrator',
 
-  requires: ['Ext.MessageBox', 'Ext.field.DatePicker', 'Ext.field.Toggle', 'Ext.field.Number', 'Ext.field.Select'],
+  // requires: ['Ext.MessageBox', 'Ext.field.DatePicker', 'Ext.field.Toggle', 'Ext.field.Number', 'Ext.field.Select'],
 
-  viewcontrollers: ['Login', 'Form'],
+  viewcontrollers: ['Login', 'Survey'],
   models: ['Invitation', 'Form', 'Unit', 'Question', 'Domain', 'Login'],
   stores: ['Invitation', 'Form', 'Unit', 'Question', 'Domain'],
-  views: ['Registration', 'RegistrationForm', 'Question', 'Summary', 'QuestionSummary', 'Message', 'Login'],
+  views: ['Survey', 'Question', 'Summary', 'QuestionSummary', 'Message', 'Login'],
 
   launch: function () {
     Ext.fly('appLoadingIndicator').destroy();

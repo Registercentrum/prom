@@ -39,7 +39,7 @@ var publicRegistrator = {
 
     self.questionStore.setData(form.get('Questions'));
 
-    var registration    = Ext.create('PublicRegistrator.view.Registration');
+    var registration    = Ext.create('PublicRegistrator.view.Survey');
     var summary         = Ext.create('PublicRegistrator.view.Summary');
     var summaryFieldset = summary.getComponent('summaryFieldset');
     var formView        = Ext.getCmp('registrationform');

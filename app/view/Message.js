@@ -7,7 +7,7 @@
         xtype: 'titlebar',
         itemId: 'title',
         title: '',
-        tpl: '{title}' // 'Fel vid hämtning av formulär'
+        tpl: '{title}'
       },
       {
         xtype: 'panel',

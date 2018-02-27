@@ -1,6 +1,6 @@
-Ext.define('PublicRegistrator.controller.Form', {
+Ext.define('PublicRegistrator.controller.Survey', {
   extend: 'Ext.app.ViewController',
-  alias: 'controller.form',
+  alias: 'controller.survey',
 
   beforeNavigation: function (container, newCard, oldCard) {
     if (typeof oldCard.validate === 'undefined') return true;
