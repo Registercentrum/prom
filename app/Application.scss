@@ -227,6 +227,7 @@ hr {
   background-color: #2196f3;
   color: white;
 }
+
 .prom-nav-summary {
     margin: auto;
 }
@@ -237,6 +238,12 @@ hr {
 
 .prom-nav-back {
     margin: 0 auto 0 0;
+}
+
+.prom-nav-spacer {
+    margin-left: auto;
+    width: 40px;
+    flex: none !important;
 }
 
 .prom-hidden {
@@ -277,9 +284,16 @@ hr {
 
 .prom-toolbar > div {
     padding: 6px 0px !important;
+    margin: 0;
 }
-.prom-spacer {
-    margin-left: auto;
+
+.prom-start-page {
+    padding: 16px;
+}
+
+.prom-start-button {
+    height: 50px;
+    margin: 30px 0 0 0;
 }
 
 .prom-radio div {

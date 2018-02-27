@@ -10,7 +10,7 @@
       {
         xtype: 'button',
         cls: 'prom-submit-answers',
-        id: 'bnSend',
+        reference: 'submitButton',
         disabled: true,
         text: 'Skicka in dina svar',
         handler: function () { this.up().onButtonClick(this);}

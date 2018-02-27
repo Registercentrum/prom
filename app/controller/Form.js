@@ -2,13 +2,12 @@ Ext.define('PublicRegistrator.controller.Form', {
   extend: 'Ext.app.ViewController',
   alias: 'controller.form',
 
-  beforeNavigation: function (container, newItem, oldItem) {
-    if (typeof oldItem.validate === 'undefined') return true;
-    var survey = this.lookup('regform');
-    survey.updateAnswer(oldItem);
-    oldItem.validate();
-    survey.validate();
-    return oldItem.isValid;
+  beforeNavigation: function (container, newCard, oldCard) {
+    if (typeof oldCard.validate === 'undefined') return true;
+    this.updateAnswer(oldCard);
+    oldCard.validate();
+    this.validate();
+    return oldCard.isValid;
   },
 
   onNavigation: function (container, newCard, oldCard) {
@@ -16,33 +15,89 @@ Ext.define('PublicRegistrator.controller.Form', {
     this.hideInactiveButtons(container);
   },
 
-  skipHiddenQuestions(container, newCard, oldCard) {
+  skipHiddenQuestions: function (container, newCard, oldCard) {
     if (!newCard.isHiddenByScript) return;
 
-    var newIndex = container.indexOf(newCard);
-    var oldIndex = container.indexOf(oldCard);
+    var newIndex = container.getInnerItems().indexOf(newCard);
+    var oldIndex = container.getInnerItems().indexOf(oldCard);
     var goingForward = newIndex > oldIndex;
     var nextIndex = goingForward ? newIndex + 1 : newIndex - 1;
-    container.setActiveItem(nextIndex - 1);
+    container.setActiveItem(nextIndex);
   },
 
-  hideInactiveButtons(container) {
-    var backButton    = Ext.getCmp('backbutton');
-    var forwardButton = Ext.getCmp('forwardbutton');
-    var summaryButton = Ext.getCmp('summary');
+  hideInactiveButtons: function (container) {
+    var backButton = this.lookup('backButton');
+    var forwardButton = this.lookup('forwardButton');
+    var summaryButton = this.lookup('summaryButton');
 
-    var atIntro   = container.getActiveIndex() === 0;
+    var atIntro = container.getActiveIndex() === 0;
     var atSummary = container.getActiveIndex() === container.getInnerItems().length - 1;
 
-    atIntro   ? backButton.addCls('prom-hidden')    : backButton.removeCls('prom-hidden');
+    atIntro ? backButton.addCls('prom-hidden') : backButton.removeCls('prom-hidden');
     atSummary ? forwardButton.addCls('prom-hidden') : forwardButton.removeCls('prom-hidden');
 
     if (atSummary) {
-      container.allTabsViewed = true;
       summaryButton.setHidden(false);
       container.down('toolbar').addCls('prom-summary-shown');
     }
   },
 
-  init: function () { }
+  onNavigationBack: function () {
+    var survey = this.lookup('regform');
+    var next = survey.getActiveIndex() - 1;
+    this.updateAnswer(survey.getActiveItem());
+    survey.animateActiveItem(next, { type: 'slide', direction: 'right' });
+  },
+
+  onNavigationSummary: function () {
+    var survey = this.lookup('regform');
+    var next = survey.getInnerItems().length;
+    this.updateAnswer(survey.getActiveItem());
+    survey.setActiveItem(next, { type: 'slide', direction: 'left' });
+  },
+
+  onNavigationForward: function () {
+    var survey = this.lookup('regform');
+    var next = survey.getActiveIndex() + 1;
+    this.updateAnswer(survey.getActiveItem());
+    survey.animateActiveItem(next, { type: 'slide', direction: 'left' });
+  },
+
+  validate: function () {
+    var survey = this.lookup('regform');
+    var questions = Ext.ComponentQuery.query('#question');
+    var submitButton = this.lookup('submitButton');
+
+    for (var i = 0; i < questions.length; i++) {
+      if (!questions[i].up().up().isValid) {
+        submitButton.setDisabled(true);
+        survey.isValid = false;
+        return;
+      }
+    }
+
+    survey.isValid = true;
+    submitButton.setDisabled(false);
+  },
+
+  updateAnswer: function (oldCard) {
+    var fieldset = oldCard.getComponent('questionfieldset');
+    var question = fieldset && fieldset.down('#question');
+    if (!question) return;
+    var name = question.getName();
+    var value = question.getValue() ? question.getValue() : null;
+    if (value && value instanceof Date) value = value.toLocaleDateString('sv-SE');
+    Current[name] = value;
+    this.updateSummaryItem(name, value);
+  },
+
+  updateSummaryItem(name, value) {
+    var answer = (value !== null && typeof NameMap[name] !== 'undefined') ? NameMap[name][value] : value;
+    answer = answer ? answer : 'Inget svar har angetts';
+
+    var survey = this.lookup('regform');
+    var summary = survey.getInnerItems()[survey.getInnerItems().length - 1];
+    var summaryQuestion = summary.getComponent('summaryFieldset').getComponent(name);
+    summaryQuestion.getComponent('response').setData({ response: answer });
+  }
 });
