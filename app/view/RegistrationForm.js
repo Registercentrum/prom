@@ -72,62 +72,8 @@
       xtype: 'tabpanel'
     },
     listeners: {
-      beforeactiveitemchange: function (container, newItem, oldItem) {
-        if (typeof oldItem.validate !== 'undefined') {
-          this.updateAnswer(oldItem);
-          oldItem.validate();
-          if (!oldItem.isValid) {
-            return false;
-          }
-        }
-        return true;
-      },
-      'activeitemchange': function (container, newCard, oldCard) {
-        var hidden;
-        var b = Ext.getCmp('backbutton');
-        var f = Ext.getCmp('forwardbutton');
-        var s = Ext.getCmp('summary');
-
-        // har vi lämnat en frågetab
-        if (typeof oldCard.validate !== 'undefined') {
-          this.updateAnswer(oldCard); // uppdatera värden
-          oldCard.validate(); // validera fråga
-          this.validate(); // Kolla om hela formuläret OK
-        }
-
-        // har frågan döljts av script sp skall vi hoppa till nästa/föregående fråga
-        if (newCard.isHiddenByScript) {
-          var forward = (container.getInnerItems().indexOf(newCard) > container.getInnerItems().indexOf(oldCard));
-
-          if (forward) {
-            container.setActiveItem(container.getInnerItems()[container.getInnerItems().indexOf(container.getActiveItem()) + 1], { type: 'slide', direction: 'left' });
-          } else {
-            container.setActiveItem(container.getInnerItems()[container.getInnerItems().indexOf(container.getActiveItem()) - 1], { type: 'slide', direction: 'right' });
-          }
-          return;
-        }
-
-        // hantera knapp "Föregående"
-        hidden = (this.getActiveItem() === this.getInnerItems()[0]);
-        // b.setHidden(hidden);
-        hidden ? b.addCls('prom-hidden') : b.removeCls('prom-hidden');
-        // hantera knapp "Nästa"
-        hidden = (this.getActiveItem() === this.getInnerItems()[this.getInnerItems().length - 1]);
-        // f.setHidden(hidden);
-        hidden ? f.addCls('prom-hidden') : f.removeCls('prom-hidden');
-        // visa knappen för att komma till sammanställningsvyn
-        if (this.allTabsViewed) {
-          hidden = (container.getActiveIndex() === container.getInnerItems().length - 1);
-          s.setHidden(hidden);
-        }
-
-        // har vi nått sammanställningsvyn
-        if (container.getActiveIndex() === container.getInnerItems().length - 1) {
-          this.allTabsViewed = true;
-          s.setHidden(false);
-          this.down('toolbar').addCls('prom-summary-shown');
-        }
-      }
+      beforeactiveitemchange: 'beforeNavigation',
+      activeitemchange: 'onNavigation'
     },
     items: [
       {

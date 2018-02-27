@@ -3,9 +3,11 @@
   requires: ['Ext.TitleBar', 'Ext.Carousel'],
   config: {
     layout: 'fit',
+    controller: 'form',
     items: [
       {
-        xtype: 'regForm'
+        xtype: 'regForm',
+        reference: 'regform'
       },
       {
         xtype: 'titlebar',
