@@ -44,9 +44,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
   onNavigationBack: function () {
     var survey = this.lookup('regform');
-    var next = survey.getActiveIndex() - 1;
+    var currentIndex = survey.getInnerItems().indexOf(survey.getActiveItem());
+    var nextQuestion = survey.getInnerItems()[currentIndex - 1];
     this.updateAnswer(survey.getActiveItem());
-    survey.animateActiveItem(next, { type: 'slide', direction: 'right' });
+    survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'right' });
   },
 
   onNavigationSummary: function () {
@@ -58,9 +59,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
   onNavigationForward: function () {
     var survey = this.lookup('regform');
-    var next = survey.getActiveIndex() + 1;
+    var currentIndex = survey.getInnerItems().indexOf(survey.getActiveItem());
+    var nextQuestion = survey.getInnerItems()[currentIndex + 1];
     this.updateAnswer(survey.getActiveItem());
-    survey.animateActiveItem(next, { type: 'slide', direction: 'left' });
+    survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'left' });
   },
 
   validate: function () {
