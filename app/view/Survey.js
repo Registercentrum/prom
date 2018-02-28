@@ -1,7 +1,11 @@
 ﻿Ext.define('PublicRegistrator.view.Survey', {
   extend: 'Ext.Panel',
   requires: ['Ext.TitleBar', 'Ext.Carousel'],
-
+  config: {
+    baseUrl: '',
+    token: '',
+    apiKey: ''
+  },
   layout: 'fit',
   controller: 'survey',
   items: [

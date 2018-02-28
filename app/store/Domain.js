@@ -17,7 +17,7 @@
       }
     }
   },
-  setDomainUrl: function (domainID) {
-    this.getProxy().setUrl('//' + publicRegistrator.config.baseURL + '/api/metadata/domains/' + domainID + '?APIKey=' + publicRegistrator.config.APIKey);
+  setDomainUrl: function (url, domainID, apikey) {
+    this.getProxy().setUrl('//' + url + '/api/metadata/domains/' + domainID + '?APIKey=' + apikey);
   }
 });

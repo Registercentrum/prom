@@ -17,7 +17,7 @@
       }
     }
   },
-  setUrlByToken: function () {
-    this.getProxy().setUrl('//' + publicRegistrator.config.baseURL + '/api/proxies/survey?token=' + publicRegistrator.config.token + '&apikey=' + publicRegistrator.config.APIKey);
+  setUrlByToken: function (url, token, apikey) {
+    this.getProxy().setUrl('//' + url + '/api/proxies/survey?token=' + token + '&apikey=' + apikey);
   }
 });
