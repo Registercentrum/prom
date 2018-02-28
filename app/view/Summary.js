@@ -5,7 +5,7 @@
   items: [
     {
       xtype: 'button',
-      cls: 'prom-submit-answers',
+      cls: 'prom-summary-submit',
       reference: 'submitButton',
       disabled: true,
       text: 'Skicka in dina svar',
@@ -15,8 +15,7 @@
       xtype: 'label',
       itemId: 'saveerror',
       reference: 'errorMessage',
-      cls: 'saveerror',
-      tpl: '<div class="saveerror">Felmeddelande: {message}</div>'
+      tpl: '<div class="prom-summary-error">Felmeddelande: {message}</div>'
     },
     {
       xtype: 'fieldset',

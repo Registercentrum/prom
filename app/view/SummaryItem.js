@@ -3,7 +3,7 @@
   requires: ['Ext.Label'],
 
   config: {
-    cls: 'prom-summary',
+    cls: 'prom-summary-item',
     items: [
       {
         itemId: 'header',
@@ -14,12 +14,12 @@
       {
         itemId: 'summaryQuestion',
         xtype: 'label',
-        tpl: '<span class="prom-summary-item">{questionText}</span>'
+        tpl: '<span class="prom-summary-item-text">{questionText}</span>'
       },
       {
         itemId: 'response',
         xtype: 'label',
-        tpl: '<span class="prom-summary-response">{response}</span>'
+        tpl: '<span class="prom-summary-item-response">{response}</span>'
       },
       {
         itemId: 'validationInfo',
