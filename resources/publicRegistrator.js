@@ -106,7 +106,7 @@ var publicRegistrator = {
     }
   },
   buildSummaryField: function (question, i, appMetaForm) {
-    var summary = Ext.create('PublicRegistrator.view.QuestionSummary');
+    var summary = Ext.create('PublicRegistrator.view.SummaryItem');
     summary.setItemId(question.get('ColumnName'));
     summary.getComponent('header').setData({
       questionNo: i + '. ' + appMetaForm[ i - 1].questionText

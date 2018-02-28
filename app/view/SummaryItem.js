@@ -1,26 +1,25 @@
-﻿Ext.define('PublicRegistrator.view.QuestionSummary', {
+﻿Ext.define('PublicRegistrator.view.SummaryItem', {
   extend: 'Ext.Panel',
   requires: ['Ext.Label'],
 
   config: {
-    cls: 'prom-question-summary',
+    cls: 'prom-summary',
     items: [
       {
         itemId: 'header',
-        cls: 'prom-summary-question-title',
+        cls: 'prom-summary-item-title',
         xtype: 'label',
-        tpl: '<span class="questionNo">{questionNo}</span>'
+        tpl: '<span class="prom-summary-item-number">{questionNo}</span>'
       },
       {
         itemId: 'summaryQuestion',
-        cls: 'prom-summary-question',
         xtype: 'label',
-        tpl: '<span class="summaryQuestion">{questionText}</span>'
+        tpl: '<span class="prom-summary-item">{questionText}</span>'
       },
       {
         itemId: 'response',
         xtype: 'label',
-        tpl: '<span class="summaryResponse">{response}</span>'
+        tpl: '<span class="prom-summary-response">{response}</span>'
       },
       {
         itemId: 'validationInfo',
@@ -30,14 +29,11 @@
       {
         xtype: 'button',
         itemId: 'toQuestion',
-        cls: 'prom-summary-question-link',
+        cls: 'prom-summary-item-link',
         iconCls: 'x-fa fa-chevron-left',
         iconAlign: 'left',
         text: 'Till frågan',
-        handler: function (bn) {
-          var rf = Ext.getCmp('registrationform');
-          rf.setActiveItem(rf.getComponent(bn.getParent().getItemId()), { type: 'slide', direction: 'left' });
-        }
+        handler: 'onNavigationToQuestion'
       }
     ]
   }

@@ -33,8 +33,8 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var atIntro = container.getActiveIndex() === 0;
     var atSummary = container.getActiveIndex() === container.getInnerItems().length - 1;
 
-    atIntro ? backButton.addCls('prom-hidden') : backButton.removeCls('prom-hidden');
-    atSummary ? forwardButton.addCls('prom-hidden') : forwardButton.removeCls('prom-hidden');
+    atIntro ? backButton.addCls('prom-nav-hidden') : backButton.removeCls('prom-nav-hidden');
+    atSummary ? forwardButton.addCls('prom-nav-hidden') : forwardButton.removeCls('prom-nav-hidden');
 
     if (atSummary) {
       summaryButton.setHidden(false);
@@ -101,5 +101,56 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var summary = survey.getInnerItems()[survey.getInnerItems().length - 1];
     var summaryQuestion = summary.getComponent('summaryFieldset').getComponent(name);
     summaryQuestion.getComponent('response').setData({ response: answer });
+  },
+
+  onNavigationToQuestion: function (bn) {
+    var rf = Ext.getCmp('registrationform');
+    rf.setActiveItem(rf.getComponent(bn.getParent().getItemId()), { type: 'slide', direction: 'left' });
+  },
+
+  onSubmitButtonClick: function (button) {
+    var controller = this;
+    button.disable();
+
+    Ext.Ajax.request({
+      url: '//' + publicRegistrator.config.baseURL + '/api/registrations',
+      params: {
+        apikey: publicRegistrator.config.APIKey,
+        Token: publicRegistrator.config.token
+      },
+      jsonData: Current,
+      success: function (r) {
+        var response = Ext.decode(r.responseText);
+        if (response.success) {
+          controller.presentThanks();
+        } else {
+          controller.presentError(response, button);
+        }
+      },
+      failure: function (r) {
+        var response = Ext.decode(r.responseText);
+        if (!response.success) {
+          if (response.message === null) {
+            controller.presentThanks();
+          } else {
+            controller.presentError(response.message, button);
+          }
+        }
+      }
+    });
+  },
+
+  presentError: function (message, bn) {
+    this.lookup('errorMessage').setData({ message: message });
+    bn.enable();
+  },
+
+  presentThanks: function () {
+    var message = '<h1>Tack för din hjälp!</h1><div>Dina svar hjälper oss göra vården bättre och vi uppskattar att du tog dig tid att svara på enkäten.</div>';
+    var messageView = Ext.create('PublicRegistrator.view.Message');
+    messageView.getComponent('title').setTitle('Tack');
+    messageView.getComponent('message').setData({ message: message });
+    Ext.Viewport.add(messageView);
+    Ext.Viewport.setActiveItem(messageView);
   }
 });
