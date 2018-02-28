@@ -83,7 +83,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   updateAnswer: function (oldCard) {
-    var fieldset = oldCard.getComponent('questionfieldset');
+    var fieldset = oldCard.getComponent('fieldset');
     var question = fieldset && fieldset.down('#question');
     if (!question) return;
     var name = question.getName();

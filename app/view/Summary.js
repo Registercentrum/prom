@@ -25,6 +25,7 @@
         xtype: 'fieldset',
         id: 'summaryFieldset',
         itemId: 'summaryFieldset',
+        reference: 'summaryItems',
         cls: 'summary',
         items: []
       }

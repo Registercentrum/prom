@@ -173,7 +173,7 @@ var publicRegistrator = {
   buildQuestion: function (question, i, numberOfQuestions, meta, self) {
     var field;
     var view = Ext.create('PublicRegistrator.view.Question');
-    var fieldset = view.getComponent('questionfieldset');
+    var fieldset = view.getComponent('fieldset');
     fieldset.setTitle('Fråga ' + i + ' av ' + numberOfQuestions);
 
     var questionText = self.buildQuestionText(question);
@@ -262,6 +262,7 @@ var publicRegistrator = {
         if (isEQ5DQuestion) {
           field = Ext.create('Ext.field.Field', {
             itemId: 'question',
+            reference: 'question',
             cls: 'prom-radio',
             html: radios,
             label: questionText,
@@ -322,6 +323,7 @@ var publicRegistrator = {
         if (!isEQ5DQuestion) {
           field = Ext.create('Ext.field.Select', {
             itemId: 'question',
+            reference: 'question',
             label: questionText,
             labelWrap: true,
             name: columnName,
@@ -343,6 +345,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1015): // Boolean
         field = Ext.create('Ext.field.Toggle', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
@@ -353,6 +356,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1020): // Text
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
@@ -364,6 +368,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1021): // Kommentar
         field = Ext.create('Ext.field.TextArea', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
@@ -375,6 +380,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1030): // Datum
         field = Ext.create('Ext.field.DatePicker', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
@@ -398,6 +404,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1033): // Tid
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
@@ -409,6 +416,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1038): // Årtal
         field = Ext.create('Ext.field.Number', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,
@@ -422,6 +430,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1040): // heltal
         field = Ext.create('Ext.field.Number', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           placeholder: 'Skriv in ett heltal',
@@ -435,6 +444,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1050): // flyttal
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           placeholder: 'Skriv in ett decimaltal',
@@ -446,6 +456,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1051): // decimaltal 1 decimal
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           placeholder: 'Skriv in ett decimaltal, 1 decimal',
@@ -457,6 +468,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1052): // decimaltal 2 decimal
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           placeholder: 'Skriv in ett decimaltal, 2 decimaler',
@@ -468,6 +480,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1053): // decimaltal 3 decimal
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           placeholder: 'Skriv in ett decimaltal, 3 decimaler',
@@ -479,6 +492,7 @@ var publicRegistrator = {
       case (domain.DomainID === 1044): // vas
         field = Ext.create('Ext.field.Field', {
           itemId: 'question',
+          reference: 'question',
           html: publicRegistrator.vas(columnName),
           label: questionText,
           labelWrap: true,
@@ -493,6 +507,7 @@ var publicRegistrator = {
       default:
         field = Ext.create('Ext.field.Text', {
           itemId: 'question',
+          reference: 'question',
           label: questionText,
           labelWrap: true,
           name: columnName,

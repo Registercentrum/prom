@@ -4,7 +4,7 @@ Ext.define('PublicRegistrator.Application', {
 
   // requires: ['Ext.MessageBox', 'Ext.field.DatePicker', 'Ext.field.Toggle', 'Ext.field.Number', 'Ext.field.Select'],
 
-  viewcontrollers: ['Login', 'Survey'],
+  viewcontrollers: ['Login', 'Survey', 'Question'],
   models: ['Invitation', 'Form', 'Unit', 'Question', 'Domain', 'Login'],
   stores: ['Invitation', 'Form', 'Unit', 'Question', 'Domain'],
   views: ['Survey', 'Question', 'Summary', 'QuestionSummary', 'Message', 'Login'],

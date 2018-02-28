@@ -24,9 +24,9 @@ var assignIf = function (condition, qName, value) {
   // if (condition)
   //    Current[qName] = value;
   if (condition) {
-    var q = Ext.getCmp('registrationform').getComponent(qName).getComponent('questionfieldset').getComponent('question');
+    var q = Ext.getCmp('registrationform').getComponent(qName).getComponent('fieldset').getComponent('question');
 
-    if (typeof q !== 'undefined') {Ext.getCmp('registrationform').getComponent(qName).getComponent('questionfieldset').getComponent('question').setValue(value);}
+    if (typeof q !== 'undefined') {Ext.getCmp('registrationform').getComponent(qName).getComponent('fieldset').getComponent('question').setValue(value);}
   }
 };
 var displayIf = function (condition, qName) {
