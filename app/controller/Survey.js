@@ -156,12 +156,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
   init: function () {
     this.config = this.getView().config;
-    this.addExtensions();
+    Ext.util.Format.decimalSeparator = ',';
     this.initInvitation(this.buildForm);
   },
-  addExtensions: function () {
-    Ext.util.Format.decimalSeparator = ',';
-  },
+
   initInvitation: function (callback) {
     var self = this;
 
@@ -176,24 +174,18 @@ Ext.define('PublicRegistrator.controller.Survey', {
       callback(self);
     });
   },
+
   buildForm: function (self) {
     var appMetaForm = [];
     var invitation = self.invitationStore.getAt(0);
-
     self.handleInvitationErrors(invitation);
-
-    if (invitation.data.Initials) {
-      Current = invitation.data.Initials;
-    }
+    Current = invitation.data.Initials ? invitation.data.Initials : Current;
 
     self.formStore.setData([invitation.get('Form')]);
     self.unitStore.setData([invitation.get('Unit')]);
-
     var form = self.formStore.getAt(0);
-
     self.questionStore.setData(form.get('Questions'));
 
-    // var registration = Ext.create('PublicRegistrator.view.Survey');
     var summary = Ext.create('PublicRegistrator.view.Summary');
     var summaryFieldset = summary.getComponent('summaryFieldset');
     var formView = Ext.getCmp('registrationform');
@@ -254,7 +246,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
       messageView.getComponent('title').setTitle('Fel vid hämtning av formulär');
       messageView.getComponent('message').setData({ message: errorMessage });
       Ext.Viewport.add(messageView);
-      return;
+      Ext.Viewport.setActiveItem(messageView);
     }
   },
   buildSummaryField: function (question, i, appMetaForm) {
@@ -267,7 +259,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     return summary;
   },
   buildQuestionText: function (q) {
-    var ret;
+    var text;
     var mappedTo;
     var prefixText = q.get('PrefixText');
     var suffixText = q.get('SuffixText');
@@ -278,30 +270,25 @@ Ext.define('PublicRegistrator.controller.Survey', {
     if (prefixText === '') {
       mappedTo = q.get('MappedTo');
       mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
-      if (mappedTo === '') {
-        ret = 'Frågetext saknas';
-      } else {
-        switch (mappedTo) {
-        case 'SubjectKey':
-          ret = 'Personnummer';
-          break;
-        case 'UnitCode':
-          ret = 'VårdenhetsID';
-          break;
-        case 'EventDate':
-          ret = 'Händelsedag';
-          break;
-        default:
-          ret = 'Frågetext saknas';
-        }
+      switch (mappedTo) {
+      case 'SubjectKey':
+        text = 'Personnummer';
+        break;
+      case 'UnitCode':
+        text = 'VårdenhetsID';
+        break;
+      case 'EventDate':
+        text = 'Händelsedag';
+        break;
+      default:
+        text = 'Frågetext saknas';
       }
     } else {
-      ret = prefixText;
+      text = prefixText;
     }
 
-    if (suffixText !== '') { ret = ret + ' (' + suffixText + ')'; }
-
-    return ret;
+    if (suffixText !== '') { text = text + ' (' + suffixText + ')'; }
+    return text;
   },
   buildInfoPanel: function (html) {
     var pn = Ext.create('PublicRegistrator.view.Question');
