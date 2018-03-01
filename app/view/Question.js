@@ -9,6 +9,16 @@
   isValid: false,
   infoOnly: false,
 
+  config: {
+    questionData: {},
+    index: 0,
+    numberOfQuestions: 0,
+    baseUrl: '',
+    token: '',
+    apikey: '',
+    infoOnly: false
+  },
+
   xtype: 'promquestion',
   controller: 'question',
   items: [

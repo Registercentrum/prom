@@ -31,5 +31,372 @@ Ext.define('PublicRegistrator.controller.Question', {
     var info = view.isValid ? '' : (view.mandatoryMessage || view.validationMessage);
     questionValidationInfo.setData({ validationInfo: info });
     summaryValidationInfo.setData({ validationInfo: info });
+  },
+
+  /**
+ *    ########  ##     ## #### ##       ########
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ########  ##     ##  ##  ##       ##     ##
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ########   #######  #### ######## ########
+ */
+
+  buildQuestion: function (question, i, numberOfQuestions) {
+    var field;
+    var view = this.getView();
+    var fieldset = view.getComponent('fieldset');
+    fieldset.setTitle('Fråga ' + i + ' av ' + numberOfQuestions);
+    var questionText = this.buildQuestionText(question);
+    view.questionText = questionText;
+    var domain = question.get('Domain');
+    var columnName = question.get('ColumnName');
+    var controlScript = question.get('ControlScript');
+    var validationScript = question.get('ValidationScript');
+    view.isMandatory = question.get('IsMandatory');
+
+    view.setItemId(columnName);
+    view.domainID = domain.DomainID;
+
+    var updateMyValue = function () {
+      var value = this.getValue();
+      if (value instanceof Date) {
+        value = value.toLocaleDateString('sv-SE');
+      }
+      Current[columnName] = value;
+    };
+
+    var validateMe = function () {
+      if (this.getParent()) {
+        var form = this.up().up();
+        var isValid = form.validate();
+        return isValid;
+      }
+      return true;
+    };
+
+    if (controlScript !== null) {
+      if (controlScript.indexOf('Parent') === -1) {
+        var cf = new Function(controlScript); // eslint-disable-line no-new-func
+        controlFunctions.push(cf);
+      }
+    }
+
+    if (validationScript !== null) {
+      if (validationScript.indexOf('Parent') === -1) {
+        var vf = new Function(validationScript); // eslint-disable-line no-new-func
+        validationFunctions.push({
+          columnName: columnName,
+          validationFunction: vf
+        });
+      }
+    }
+
+    var config = {
+      itemId: 'question',
+      reference: 'question',
+      label: questionText,
+      labelWrap: true,
+      name: columnName,
+      labelWidth: '60%',
+      labelAlign: 'top'
+    };
+
+    if (domain.IsEnumerated) {
+      var store = Ext.create('PublicRegistrator.store.Domain');
+      store.setDomainUrl(view.config.baseUrl, domain.DomainID, view.config.apikey);
+      store.load(function () {
+        /*
+        var qOptions = [{
+          text: '',
+          value: ''
+        }];
+        */
+        var qOptions = [];
+        var radios = document.createElement('div');
+        var dv = store.getAt(0).getData().DomainValues;
+        NameMap[columnName] = {};
+
+        // This array contains all the DomainIDs that will render as radiobuttons
+        var EQ5DQuestions = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
+        var isEQ5DQuestion = EQ5DQuestions.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+        if (isEQ5DQuestion) {
+          field = Ext.create('Ext.field.Field', Ext.apply(config, {
+            cls: 'prom-radio',
+            html: radios,
+            placeholder: 'Skriv in ett decimaltal, 3 decimaler'
+          }));
+        }
+
+        var onRadioclick = function () {
+          var input = document.querySelector('input[name="' + columnName + '"]:checked');
+          Array.prototype.map.call(document.querySelectorAll('input[name="' + columnName + '"]'), function (node) {
+            node.parentNode.className = '';
+          });
+          if (input.value === field.getValue()) {
+            input.checked = false;
+            field.setValue(null);
+          } else {
+            field.setValue(input.value);
+            input.parentNode.className = 'checked';
+          }
+
+          updateMyValue.bind(field)();
+          controlFunction();
+          validationFunction.bind(field)();
+          validateMe.bind(field)();
+        };
+
+        for (var j = 0; j < dv.length; j++) {
+          // Store a map of all ValueCodes to ValueName for summary
+          NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
+          if (dv[j].IsActive) {
+            // only create costum radiobuttons for questionIds in EQ5DQuestions
+            if (isEQ5DQuestion) {
+              var label = document.createElement('label');
+              label.innerHTML = dv[j].ValueName;
+              var radio = document.createElement('input');
+              radio.setAttribute('type', 'radio');
+              radio.setAttribute('name', columnName);
+              radio.setAttribute('value', dv[j].ValueCode);
+              radio.onclick = onRadioclick;
+              label.appendChild(radio);
+              radios.appendChild(label);
+              if (j !== dv.length) {
+                radios.appendChild(document.createElement('hr'));
+              }
+              // If the question isn't in EQ5DQuestions then we show the old select menu.
+            } else {
+              qOptions.push({
+                text: dv[j].ValueName,
+                value: dv[j].ValueCode
+              });
+            }
+          }
+        }
+        if (!isEQ5DQuestion) {
+          field = Ext.create('Ext.field.Select', Ext.apply(config, {
+            options: qOptions,
+            placeholder: 'Tryck här för att välja alternativ ....'
+          }));
+        }
+
+        field.on('change', updateMyValue, field, {});
+        field.on('change', controlFunction, this, {});
+        field.on('change', validateMe, field, {});
+
+        fieldset.add(field);
+      });
+    } else {
+      switch (true) {
+      case (domain.DomainID === 1015): // Boolean
+        field = Ext.create('Ext.field.Toggle', config);
+        break;
+      case (domain.DomainID === 1020): // Text
+        field = Ext.create('Ext.field.Text', Ext.apply(config, {placeholder: 'Skriv svar här'}));
+        break;
+      case (domain.DomainID === 1021): // Kommentar
+        field = Ext.create('Ext.field.TextArea', Ext.apply(config, {placeholder: 'Skriv svar här'}));
+        break;
+      case (domain.DomainID === 1030): // Datum
+        field = Ext.create('Ext.field.DatePicker', Ext.apply(config, {
+          value: new Date(),
+          dateFormat: 'Y-m-d',
+          useTitles: true,
+          yearText: 'År',
+          monthText: 'Månad',
+          dayText: 'Dag',
+          error: {
+            errorTarget: 'bottom'
+          },
+          validators: function () { updateMyValue.call(this); return validateMe.call(this); },
+          doneButton: {
+            ui: 'Klar!'
+          }
+        }));
+        break;
+      case (domain.DomainID === 1033): // Tid
+        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in tid här (hh:mm)'}));
+        break;
+      case (domain.DomainID === 1038): // Årtal
+        field = Ext.create('Ext.field.Number', Ext.apply(config, {
+          placeholder: 'Skriv in ett årtal',
+          minValue: 1900,
+          value: new Date().getFullYear()
+        }));
+        break;
+      case (domain.DomainID === 1040): // heltal
+        field = Ext.create('Ext.field.Number', Ext.apply(config, { placeholder: 'Skriv in ett heltal'}));
+        // errorTarget: 'under'
+        // validators: function (value) { if (this.isBlurring()) { /*updateMyValue.call(f); return validateMe.call(f);*/} else { return true;} }
+        break;
+      case (domain.DomainID === 1050): // flyttal
+        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal'}));
+        break;
+      case (domain.DomainID === 1051): // decimaltal 1 decimal
+        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 1 decimal'}));
+        break;
+      case (domain.DomainID === 1052): // decimaltal 2 decimal
+        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 2 decimaler'}));
+        break;
+      case (domain.DomainID === 1053): // decimaltal 3 decimal
+        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 3 decimaler'}));
+        break;
+      case (domain.DomainID === 1044): // vas
+        field = Ext.create('Ext.field.Field', Ext.apply(config, {
+          html: this.vas(columnName),
+          placeholder: 'Skriv in ett decimaltal, 3 decimaler'
+        }));
+        break;
+      case (domain.DomainID === 1080): // Labels
+        break;
+      default:
+        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ' + domain.DomainTitle}));
+        break;
+      }
+
+      field.on('change', updateMyValue, field, {});
+      field.on('change', controlFunction, this, {});
+      field.on('change', validateMe, field, {});
+
+      fieldset.add(field);
+    }
+    Current[columnName] = null;
+
+    view.add(fieldset);
+    return view;
+  },
+
+  buildQuestionText: function (q) {
+    var text;
+    var mappedTo;
+    var prefixText = q.get('PrefixText');
+    var suffixText = q.get('SuffixText');
+
+    prefixText = prefixText !== null ? prefixText.trim() : '';
+    suffixText = suffixText !== null ? suffixText.trim() : '';
+
+    if (prefixText === '') {
+      mappedTo = q.get('MappedTo');
+      mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
+      switch (mappedTo) {
+      case 'SubjectKey':
+        text = 'Personnummer';
+        break;
+      case 'UnitCode':
+        text = 'VårdenhetsID';
+        break;
+      case 'EventDate':
+        text = 'Händelsedag';
+        break;
+      default:
+        text = 'Frågetext saknas';
+      }
+    } else {
+      text = prefixText;
+    }
+
+    if (suffixText !== '') { text = text + ' (' + suffixText + ')'; }
+    return text;
+  },
+
+  init: function () {
+    var config = this.getView().config;
+    if (config.infoOnly) return;
+    this.buildQuestion(config.questionData, config.index, config.numberOfQuestions, config.meta);
+  },
+
+  /**
+ *    ##     ##    ###     ######           ######   ######     ###    ##       ########
+ *    ##     ##   ## ##   ##    ##         ##    ## ##    ##   ## ##   ##       ##
+ *    ##     ##  ##   ##  ##               ##       ##        ##   ##  ##       ##
+ *    ##     ## ##     ##  ######  #######  ######  ##       ##     ## ##       ######
+ *     ##   ##  #########       ##               ## ##       ######### ##       ##
+ *      ## ##   ##     ## ##    ##         ##    ## ##    ## ##     ## ##       ##
+ *       ###    ##     ##  ######           ######   ######  ##     ## ######## ########
+ */
+
+  vasScale: function (columnName) {
+    var changeValue = this.changeFieldValue(columnName);
+    var scaleThermometer = document.createElement('div');
+    scaleThermometer.className = 'scaleThermometer';
+    for (var i = 100; i >= 0; i--) {
+      var clickable = document.createElement('div');
+      var line = document.createElement('div');
+      line.className = 'line';
+      clickable.className = 'clickableLine';
+      clickable.style.margin = (i % 10 === 0 ? '1px' : 0) + ' 0';
+      line.style.width = i % 10 === 0 ? '30px' : '15px';
+      line.style.height = i % 10 === 0 ? '3px' : '1px';
+      clickable.onclick = changeValue(i);
+      clickable.id = i;
+      clickable.appendChild(line);
+      scaleThermometer.appendChild(clickable);
+    }
+    return scaleThermometer;
+  },
+  vasNumbers: function () {
+    var parent = document.createElement('div');
+    parent.className = 'vasNumberContainer';
+    for (var i = 10; i >= 0; i--) {
+      var number = document.createElement('h5');
+      number.style.margin = '0 10px';
+      number.appendChild(document.createTextNode(i * 10));
+      parent.appendChild(number);
+    }
+    return parent;
+  },
+  vasScaleWithHeaders: function (columnName) {
+    var scaleDiv = document.createElement('div');
+    scaleDiv.className = 'scaleContainer';
+    scaleDiv.appendChild(this.vasNumbers());
+    scaleDiv.appendChild(this.vasScale(columnName));
+
+    var scaleWithHeader = document.createElement('div');
+    scaleWithHeader.className = 'scaleWithHeader';
+    var topHeader = document.createElement('h6');
+    topHeader.setAttribute('style', 'text-align: center');
+    topHeader.appendChild(document.createTextNode('Bästa tänkbara tillstånd'));
+    var bottomHeader = document.createElement('h6');
+    bottomHeader.setAttribute('style', 'text-align: center');
+    bottomHeader.appendChild(document.createTextNode('Sämsta tänkbara tillstånd'));
+    scaleWithHeader.appendChild(topHeader);
+    scaleWithHeader.appendChild(scaleDiv);
+    scaleWithHeader.appendChild(bottomHeader);
+    return scaleWithHeader;
+  },
+  vas: function (columnName) {
+    var scaleInfoText = document.createElement('div');
+    scaleInfoText.className = 'scaleInfoText';
+    scaleInfoText.appendChild(document.createTextNode('Peka på skalan.'));
+
+    var currentValContainer = document.createElement('div');
+    currentValContainer.className = 'currentValContainer';
+    currentValContainer.appendChild(document.createTextNode('Dagens hälsa är'));
+    var value = document.createElement('h2');
+    value.style.color = 'white';
+    value.style.height = '50px';
+    value.id = 'vasValue';
+    currentValContainer.appendChild(value);
+    scaleInfoText.appendChild(currentValContainer);
+    var scaleInfoContainer = document.createElement('div');
+    scaleInfoContainer.appendChild(scaleInfoText);
+    scaleInfoContainer.className = 'scaleInfoContainer';
+    scaleInfoContainer.appendChild(this.vasScaleWithHeaders(columnName));
+    return scaleInfoContainer;
+  },
+  changeFieldValue: function (columnName) {
+    return function (value) {
+      return function () {
+        Array.prototype.map.call(document.getElementsByClassName('selected'), function (i) {
+          i.className = 'clickableLine';
+        });
+        document.getElementById(value).className = 'selected clickableLine';
+        var field = Ext.ComponentQuery.query('[name=' + columnName + ']')[0];
+        document.getElementById('vasValue').innerHTML = value;
+        field.setValue(value);
+      };
+    };
   }
 });
