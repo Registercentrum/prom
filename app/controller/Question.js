@@ -47,17 +47,16 @@ Ext.define('PublicRegistrator.controller.Question', {
     var field;
     var view = this.getView();
     var fieldset = view.getComponent('fieldset');
-    fieldset.setTitle('Fråga ' + i + ' av ' + numberOfQuestions);
     var questionText = this.buildQuestionText(question);
-    view.questionText = questionText;
     var domain = question.get('Domain');
     var columnName = question.get('ColumnName');
-    var controlScript = question.get('ControlScript');
-    var validationScript = question.get('ValidationScript');
-    view.isMandatory = question.get('IsMandatory');
 
+    fieldset.setTitle('Fråga ' + i + ' av ' + numberOfQuestions);
+    view.questionText = questionText;
+    view.isMandatory = question.get('IsMandatory');
     view.setItemId(columnName);
     view.domainID = domain.DomainID;
+    this.addQuestionScripts(question);
 
     var updateMyValue = function () {
       var value = this.getValue();
@@ -76,23 +75,6 @@ Ext.define('PublicRegistrator.controller.Question', {
       return true;
     };
 
-    if (controlScript !== null) {
-      if (controlScript.indexOf('Parent') === -1) {
-        var cf = new Function(controlScript); // eslint-disable-line no-new-func
-        controlFunctions.push(cf);
-      }
-    }
-
-    if (validationScript !== null) {
-      if (validationScript.indexOf('Parent') === -1) {
-        var vf = new Function(validationScript); // eslint-disable-line no-new-func
-        validationFunctions.push({
-          columnName: columnName,
-          validationFunction: vf
-        });
-      }
-    }
-
     var config = {
       itemId: 'question',
       reference: 'question',
@@ -102,92 +84,11 @@ Ext.define('PublicRegistrator.controller.Question', {
       labelWidth: '60%',
       labelAlign: 'top'
     };
-
+    var self = this;
     if (domain.IsEnumerated) {
       var store = Ext.create('PublicRegistrator.store.Domain');
       store.setDomainUrl(view.config.baseUrl, domain.DomainID, view.config.apikey);
-      store.load(function () {
-        /*
-        var qOptions = [{
-          text: '',
-          value: ''
-        }];
-        */
-        var qOptions = [];
-        var radios = document.createElement('div');
-        var dv = store.getAt(0).getData().DomainValues;
-        NameMap[columnName] = {};
-
-        // This array contains all the DomainIDs that will render as radiobuttons
-        var EQ5DQuestions = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
-        var isEQ5DQuestion = EQ5DQuestions.indexOf(parseInt(domain.DomainID, 10)) !== -1;
-        if (isEQ5DQuestion) {
-          field = Ext.create('Ext.field.Field', Ext.apply(config, {
-            cls: 'prom-radio',
-            html: radios,
-            placeholder: 'Skriv in ett decimaltal, 3 decimaler'
-          }));
-        }
-
-        var onRadioclick = function () {
-          var input = document.querySelector('input[name="' + columnName + '"]:checked');
-          Array.prototype.map.call(document.querySelectorAll('input[name="' + columnName + '"]'), function (node) {
-            node.parentNode.className = '';
-          });
-          if (input.value === field.getValue()) {
-            input.checked = false;
-            field.setValue(null);
-          } else {
-            field.setValue(input.value);
-            input.parentNode.className = 'checked';
-          }
-
-          updateMyValue.bind(field)();
-          controlFunction();
-          validationFunction.bind(field)();
-          validateMe.bind(field)();
-        };
-
-        for (var j = 0; j < dv.length; j++) {
-          // Store a map of all ValueCodes to ValueName for summary
-          NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
-          if (dv[j].IsActive) {
-            // only create costum radiobuttons for questionIds in EQ5DQuestions
-            if (isEQ5DQuestion) {
-              var label = document.createElement('label');
-              label.innerHTML = dv[j].ValueName;
-              var radio = document.createElement('input');
-              radio.setAttribute('type', 'radio');
-              radio.setAttribute('name', columnName);
-              radio.setAttribute('value', dv[j].ValueCode);
-              radio.onclick = onRadioclick;
-              label.appendChild(radio);
-              radios.appendChild(label);
-              if (j !== dv.length) {
-                radios.appendChild(document.createElement('hr'));
-              }
-              // If the question isn't in EQ5DQuestions then we show the old select menu.
-            } else {
-              qOptions.push({
-                text: dv[j].ValueName,
-                value: dv[j].ValueCode
-              });
-            }
-          }
-        }
-        if (!isEQ5DQuestion) {
-          field = Ext.create('Ext.field.Select', Ext.apply(config, {
-            options: qOptions,
-            placeholder: 'Tryck här för att välja alternativ ....'
-          }));
-        }
-
-        field.on('change', updateMyValue, field, {});
-        field.on('change', controlFunction, this, {});
-        field.on('change', validateMe, field, {});
-
-        fieldset.add(field);
-      });
+      store.load(function () {self.buildSelectQuestion(store, columnName, domain, config, updateMyValue, validateMe, fieldset);});
     } else {
       switch (true) {
       case (domain.DomainID === 1015): // Boolean
@@ -199,14 +100,8 @@ Ext.define('PublicRegistrator.controller.Question', {
       case (domain.DomainID === 1021): // Kommentar
         field = Ext.create('Ext.field.TextArea', Ext.apply(config, {placeholder: 'Skriv svar här'}));
         break;
-      case (domain.DomainID === 1030): // Datum
-        field = Ext.create('Ext.field.DatePicker', Ext.apply(config, {
-          value: new Date(),
-          dateFormat: 'Y-m-d',
-          useTitles: true,
-          yearText: 'År',
-          monthText: 'Månad',
-          dayText: 'Dag',
+      case (domain.DomainID === 1030):
+        field = Ext.create('Ext.field.DatePicker', Ext.apply(config, { value: new Date(), dateFormat: 'Y-m-d', useTitles: true, yearText: 'År', monthText: 'Månad', dayText: 'Dag',
           error: {
             errorTarget: 'bottom'
           },
@@ -216,38 +111,31 @@ Ext.define('PublicRegistrator.controller.Question', {
           }
         }));
         break;
-      case (domain.DomainID === 1033): // Tid
+      case (domain.DomainID === 1033):
         field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in tid här (hh:mm)'}));
         break;
-      case (domain.DomainID === 1038): // Årtal
-        field = Ext.create('Ext.field.Number', Ext.apply(config, {
-          placeholder: 'Skriv in ett årtal',
-          minValue: 1900,
-          value: new Date().getFullYear()
-        }));
+      case (domain.DomainID === 1038):
+        field = Ext.create('Ext.field.Number', Ext.apply(config, { placeholder: 'Skriv in ett årtal', minValue: 1900, value: new Date().getFullYear()}));
         break;
-      case (domain.DomainID === 1040): // heltal
+      case (domain.DomainID === 1040):
         field = Ext.create('Ext.field.Number', Ext.apply(config, { placeholder: 'Skriv in ett heltal'}));
         // errorTarget: 'under'
         // validators: function (value) { if (this.isBlurring()) { /*updateMyValue.call(f); return validateMe.call(f);*/} else { return true;} }
         break;
-      case (domain.DomainID === 1050): // flyttal
+      case (domain.DomainID === 1050):
         field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal'}));
         break;
-      case (domain.DomainID === 1051): // decimaltal 1 decimal
+      case (domain.DomainID === 1051):
         field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 1 decimal'}));
         break;
-      case (domain.DomainID === 1052): // decimaltal 2 decimal
+      case (domain.DomainID === 1052):
         field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 2 decimaler'}));
         break;
-      case (domain.DomainID === 1053): // decimaltal 3 decimal
+      case (domain.DomainID === 1053):
         field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 3 decimaler'}));
         break;
-      case (domain.DomainID === 1044): // vas
-        field = Ext.create('Ext.field.Field', Ext.apply(config, {
-          html: this.vas(columnName),
-          placeholder: 'Skriv in ett decimaltal, 3 decimaler'
-        }));
+      case (domain.DomainID === 1044):
+        field = Ext.create('Ext.field.Field', Ext.apply(config, { html: this.vas(columnName), placeholder: 'Skriv in ett decimaltal, 3 decimaler'}));
         break;
       case (domain.DomainID === 1080): // Labels
         break;
@@ -266,6 +154,90 @@ Ext.define('PublicRegistrator.controller.Question', {
 
     view.add(fieldset);
     return view;
+  },
+
+  /**
+ *     ######  ######## ##       ########  ######  ########
+ *    ##    ## ##       ##       ##       ##    ##    ##
+ *    ##       ##       ##       ##       ##          ##
+ *     ######  ######   ##       ######   ##          ##
+ *          ## ##       ##       ##       ##          ##
+ *    ##    ## ##       ##       ##       ##    ##    ##
+ *     ######  ######## ######## ########  ######     ##
+ */
+
+  buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset) {
+    var RadioSelectDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
+    var isRadioSelect = RadioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+    var isDropdown = !isRadioSelect;
+    var field;
+    var dv = store.getAt(0).getData().DomainValues;
+    NameMap[columnName] = {};
+
+    if (isRadioSelect) {
+      var radios = document.createElement('div');
+      field = Ext.create('Ext.field.Field', Ext.apply(config, {
+        cls: 'prom-radio',
+        html: radios,
+        placeholder: 'Skriv in ett decimaltal, 3 decimaler'
+      }));
+      var onRadioclick = function () {
+        var checked = document.querySelector('input[name="' + columnName + '"]:checked');
+        var inputs = document.querySelectorAll('input[name="' + columnName + '"]');
+        inputs.forEach(function (node) {node.parentNode.className = '';});
+        if (checked.value === field.getValue()) {
+          checked.checked = false;
+          field.setValue(null);
+        } else {
+          field.setValue(checked.value);
+          checked.parentNode.className = 'checked';
+        }
+
+        updateMyValue.bind(field)();
+        controlFunction();
+        validationFunction.bind(field)();
+        validateMe.bind(field)();
+      };
+      for (var j = 0; j < dv.length; j++) {
+        NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
+        if (dv[j].IsActive) {
+          var label = document.createElement('label');
+          label.innerHTML = dv[j].ValueName;
+          var radio = document.createElement('input');
+          radio.setAttribute('type', 'radio');
+          radio.setAttribute('name', columnName);
+          radio.setAttribute('value', dv[j].ValueCode);
+          radio.onclick = onRadioclick;
+          label.appendChild(radio);
+          radios.appendChild(label);
+          if (j !== dv.length) {
+            radios.appendChild(document.createElement('hr'));
+          }
+        }
+      }
+    }
+    if (isDropdown) {
+      var qOptions = [];
+      for (var k = 0; k < dv.length; k++) {
+        NameMap[columnName][dv[k].ValueCode] = dv[k].ValueName;
+        if (dv[k].IsActive) {
+          qOptions.push({
+            text: dv[k].ValueName,
+            value: dv[k].ValueCode
+          });
+        }
+      }
+      field = Ext.create('Ext.field.Select', Ext.apply(config, {
+        options: qOptions,
+        placeholder: 'Tryck här för att välja alternativ ....'
+      }));
+    }
+
+    field.on('change', updateMyValue, field, {});
+    field.on('change', controlFunction, this, {});
+    field.on('change', validateMe, field, {});
+
+    fieldset.add(field);
   },
 
   buildQuestionText: function (q) {
@@ -299,6 +271,28 @@ Ext.define('PublicRegistrator.controller.Question', {
 
     if (suffixText !== '') { text = text + ' (' + suffixText + ')'; }
     return text;
+  },
+
+  addQuestionScripts(question) {
+    var controlScript = question.get('ControlScript');
+    var validationScript = question.get('ValidationScript');
+
+    if (controlScript !== null) {
+      if (controlScript.indexOf('Parent') === -1) {
+        var cf = new Function(controlScript); // eslint-disable-line no-new-func
+        controlFunctions.push(cf);
+      }
+    }
+
+    if (validationScript !== null) {
+      if (validationScript.indexOf('Parent') === -1) {
+        var vf = new Function(validationScript); // eslint-disable-line no-new-func
+        validationFunctions.push({
+          columnName: question.get('ColumnName'),
+          validationFunction: vf
+        });
+      }
+    }
   },
 
   init: function () {
