@@ -10,14 +10,13 @@ Ext.define('PublicRegistrator.Application', {
   views: ['Survey', 'Question', 'Summary', 'SummaryItem', 'Message', 'Login'],
 
   launch: function () {
-    Ext.fly('appLoadingIndicator').destroy();
-
     var baseURL = window.location.hostname;
     var token = this.getParameterByName('token');
     var apikey = this.getApiKey(baseURL);
-
     if (token !== '') {
       // publicRegistrator.init({ token: token, APIKey: apikey, baseURL: baseURL });
+      Ext.Viewport.setCls('hidden');
+      console.timeStamp('application');
       Ext.Viewport.add(Ext.create('PublicRegistrator.view.Survey', {baseUrl: baseURL, token: token, apikey: apikey}));
     } else {
       Ext.Viewport.add(Ext.create('PublicRegistrator.view.Login'));

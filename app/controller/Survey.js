@@ -168,7 +168,6 @@ Ext.define('PublicRegistrator.controller.Survey', {
     self.questionStore = Ext.getStore('Question');
     self.domainStore = Ext.getStore('Domain');
     self.invitationStore = Ext.getStore('Invitation');
-
     self.invitationStore.setUrlByToken(this.config.baseUrl, this.config.token, this.config.apikey);
     self.invitationStore.load(function () {
       callback(self);
@@ -223,6 +222,8 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
     formView.add(summary);
     controlFunction();
+    Ext.fly('appLoadingIndicator').destroy();
+    Ext.getCmp('ext-viewport').removeCls('hidden');
   },
 
   handleInvitationErrors(invitation) {
@@ -265,12 +266,12 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   buildInfoPanel: function (html) {
-    var pn = Ext.create('PublicRegistrator.view.Question', {infoOnly: true});
-    pn.setItems([]);
-    pn.setHtml(html);
-    pn.infoOnly = true;
+    var panel = Ext.create('PublicRegistrator.view.Question', {isInfo: true});
+    panel.setItems([]);
+    panel.setHtml(html);
+    panel.isInfo = true;
 
-    return pn;
+    return panel;
   },
 
   getVASInfo: function (i, n) {

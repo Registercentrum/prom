@@ -5,7 +5,9 @@ html, body {
     background-color: #1985D0;
     cursor: pointer;
 }
-
+.hidden {
+    visibility: hidden;
+}
 #appLoadingIndicator {
     position: absolute;
     top: 50%;

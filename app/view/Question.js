@@ -7,7 +7,7 @@
   mandatoryMessage: null,
   validationMessage: null,
   isValid: false,
-  infoOnly: false,
+  isInfo: false,
 
   config: {
     questionData: {},
@@ -16,7 +16,7 @@
     baseUrl: '',
     token: '',
     apikey: '',
-    infoOnly: false
+    isInfo: false
   },
 
   xtype: 'promquestion',

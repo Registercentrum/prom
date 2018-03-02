@@ -4,7 +4,7 @@ Ext.define('PublicRegistrator.controller.Question', {
 
   validate: function () {
     var view = this.getView();
-    if (view.infoOnly) {
+    if (view.isInfo) {
       view.isValid = true;
       return true;
     }
@@ -147,11 +147,9 @@ Ext.define('PublicRegistrator.controller.Question', {
       field.on('change', updateMyValue, field, {});
       field.on('change', controlFunction, this, {});
       field.on('change', validateMe, field, {});
-
       fieldset.add(field);
     }
     Current[columnName] = null;
-
     view.add(fieldset);
     return view;
   },
@@ -297,7 +295,7 @@ Ext.define('PublicRegistrator.controller.Question', {
 
   init: function () {
     var config = this.getView().config;
-    if (config.infoOnly) return;
+    if (config.isInfo) return;
     this.buildQuestion(config.questionData, config.index, config.numberOfQuestions, config.meta);
   },
 
