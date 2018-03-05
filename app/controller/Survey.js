@@ -35,6 +35,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
     atIntro ? backButton.addCls('prom-nav-hidden') : backButton.removeCls('prom-nav-hidden');
     atSummary ? forwardButton.addCls('prom-nav-hidden') : forwardButton.removeCls('prom-nav-hidden');
+    atSummary ? summaryButton.addCls('prom-nav-hidden') : summaryButton.removeCls('prom-nav-hidden');
 
     if (atSummary) {
       summaryButton.setHidden(false);
@@ -74,8 +75,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
       if (!questions[i].up().up().isValid) {
         submitButton.setDisabled(true);
         survey.isValid = false;
+        this.presentError('En eller flera av svaren är märkta i rött och behöver ändras innan du kan skicka in dem.');
         return;
       }
+      this.presentError('');
     }
 
     survey.isValid = true;
@@ -119,30 +122,19 @@ Ext.define('PublicRegistrator.controller.Survey', {
         Token: this.config.token
       },
       jsonData: Current,
-      success: function (r) {
-        var response = Ext.decode(r.responseText);
-        if (response.success) {
-          controller.presentThanks();
-        } else {
-          controller.presentError(response, button);
-        }
+      success: function () {
+        controller.presentThanks();
       },
       failure: function (r) {
         var response = Ext.decode(r.responseText);
-        if (!response.success) {
-          if (response.message === null) {
-            controller.presentThanks();
-          } else {
-            controller.presentError(response.message, button);
-          }
-        }
+        controller.presentThanks();
+        console.error(response && response.message); // eslint-disable-line no-console
       }
     });
   },
 
-  presentError: function (message, bn) {
-    this.lookup('errorMessage').setData({ message: message });
-    bn.enable();
+  presentError: function (message) {
+    this.lookup('errorMessage').setData({ message: message }).setHidden(message === '');
   },
 
   presentThanks: function () {
@@ -194,16 +186,20 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
     self.questionStore.filterBy(function (question) {
       var mappedTo = question.get('MappedTo');
-      if (mappedTo === null || mappedTo === 'M3Pat_Info2') {
+      if (mappedTo === null || mappedTo === 'EventDate' || mappedTo === 'M3Pat_Info2') {
         return true;
       }
       return false;
     });
 
-    var numberOfQuestions = self.questionStore.getData().items.filter(function (question) {return question.data.Domain.DomainID !== 1080;} ).length;
+    var numberOfQuestions = self.questionStore.getData().items.filter(function (question) {return (question.get('Domain').DomainID !== 1080 && question.get('MappedTo') !== 'EventDate');} ).length;
     var i = 0;
+    var offset = 0;
     self.questionStore.each(function (question) {
       i++;
+      if (question.get('MappedTo') === 'EventDate') {
+        offset = 1;
+      }
       if (question.data.Domain.DomainID === 1080 && question.get('ControlScript') === null) {
         var infoPanel = self.buildInfoPanel(self.getInfoText(question));
         formView.add(infoPanel);
@@ -215,15 +211,19 @@ Ext.define('PublicRegistrator.controller.Survey', {
         formView.add(pnInfo);
       }
       // var pnQuestion = self.buildQuestion(question, i, numberOfQuestions, appMetaForm, self);
-      var pnQuestion = Ext.create('PublicRegistrator.view.Question', {questionData: question, index: i, numberOfQuestions: numberOfQuestions, baseUrl: self.config.baseUrl, token: self.config.token, apikey: self.config.apikey});
+      var pnQuestion = Ext.create('PublicRegistrator.view.Question', {questionData: question, index: i - offset, numberOfQuestions: numberOfQuestions, baseUrl: self.config.baseUrl, token: self.config.token, apikey: self.config.apikey});
       appMetaForm.push({
-        questionNo: i,
+        questionNo: i - offset,
         questionText: pnQuestion.questionText,
         columnName: question.get('ColumnName')
       });
       formView.add(pnQuestion);
-      var pnQuestionSummary = self.buildSummaryField(question, i, appMetaForm);
+      var pnQuestionSummary = self.buildSummaryField(question, i, offset, appMetaForm);
       summaryFieldset.add(pnQuestionSummary);
+      if (question.get('MappedTo') === 'EventDate') {
+        formView.down('#' + question.get('ColumnName')).isHiddenByScript = true;
+        summaryFieldset.down('#' + question.get('ColumnName')).setHidden(true);
+      }
     });
 
     formView.add(summary);
@@ -257,11 +257,11 @@ Ext.define('PublicRegistrator.controller.Survey', {
     }
   },
 
-  buildSummaryField: function (question, i, appMetaForm) {
+  buildSummaryField: function (question, i, offset, appMetaForm) {
     var summary = Ext.create('PublicRegistrator.view.SummaryItem');
     summary.setItemId(question.get('ColumnName'));
     summary.getComponent('header').setData({
-      questionNo: i + '. ' + appMetaForm[i - 1].questionText
+      questionNo: (i - offset) + '. ' + appMetaForm[i - 1].questionText
     });
 
     return summary;

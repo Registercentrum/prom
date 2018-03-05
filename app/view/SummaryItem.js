@@ -29,9 +29,9 @@
       {
         xtype: 'button',
         cls: 'prom-summary-item-link',
-        iconCls: 'x-fa fa-chevron-left',
+        iconCls: 'x-fa fa-angle-left',
         iconAlign: 'left',
-        text: 'Till frågan',
+        text: 'Ändra svaret',
         handler: 'onNavigationToQuestion'
       }
     ]

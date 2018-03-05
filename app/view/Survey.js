@@ -34,7 +34,7 @@
               text: 'Föregående',
               reference: 'backButton',
               cls: 'prom-nav-back prom-nav-hidden',
-              iconCls: 'x-fa fa-chevron-left',
+              iconCls: 'x-fa fa-angle-left',
               iconAlign: 'left',
               handler: 'onNavigationBack'
             },
@@ -55,7 +55,7 @@
               text: 'Nästa',
               reference: 'forwardButton',
               cls: 'prom-nav-forward',
-              iconCls: 'x-fa fa-chevron-right',
+              iconCls: 'x-fa fa-angle-right',
               iconAlign: 'right',
               handler: 'onNavigationForward'
             }
