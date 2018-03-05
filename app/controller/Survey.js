@@ -194,16 +194,22 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
     self.questionStore.filterBy(function (question) {
       var mappedTo = question.get('MappedTo');
-      if (mappedTo === null || mappedTo === 'EventDate') {
+      if (mappedTo === null || mappedTo === 'M3Pat_Info2') {
         return true;
       }
       return false;
     });
 
-    var numberOfQuestions = self.questionStore.getCount();
+    var numberOfQuestions = self.questionStore.getData().items.filter(function (question) {return question.data.Domain.DomainID !== 1080;} ).length;
     var i = 0;
     self.questionStore.each(function (question) {
       i++;
+      if (question.data.Domain.DomainID === 1080 && question.get('ControlScript') === null) {
+        var infoPanel = self.buildInfoPanel(self.getInfoText(question));
+        formView.add(infoPanel);
+        i--;
+        return;
+      }
       if (question.data.Domain.DomainID === 1044) {
         var pnInfo = self.buildInfoPanel(self.getVASInfo(i, numberOfQuestions));
         formView.add(pnInfo);
@@ -230,16 +236,12 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var replyStatus = invitation.get('ReplyStatus');
     var errorMessage;
 
-    if (replyStatus === 100) {
-      errorMessage = 'Detta formulär har redan besvarats.';
-    }
-
-    if (replyStatus === 110) {
-      errorMessage = 'Denna formulärinbjudan är avbruten.';
-    }
-
     if (replyStatus === 99) {
       errorMessage = 'Denna formulärinbjudan har utgått.';
+    }
+
+    if (replyStatus === 100) {
+      errorMessage = 'Detta formulär har redan besvarats.';
     }
 
     if (!errorMessage && invitation.get('IsOngoing') === false) {
@@ -275,7 +277,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   getVASInfo: function (i, n) {
-    var header = '<div class="x-component x-title x-form-fieldset-title x-dock-item x-docked-top"><div class="x-innerhtml">Fråga ' + i + ' av ' + n + '</div></div>';
+    var header = '<div class="prom-question x-component x-title x-form-fieldset-title x-dock-item x-docked-top"><div class="x-innerhtml">Fråga ' + i + ' av ' + n + '</div></div>';
     // var header = '<div ="x-innerhtml">Fråga ' + i + ' av ' + n + '</div>';
     var html = [header,
       '<p>− Vi vill veta hur bra eller dålig din hälsa är IDAG.</p>',
@@ -283,6 +285,11 @@ Ext.define('PublicRegistrator.controller.Survey', {
       '<p>− 100 är den bästa hälsa du kan tänka dig.</p>',
       '<p>− 0 är den sämsta hälsa du kan tänka dig.</p>',
       '<p>− Klicka på skalan för att visa hur din hälsa är IDAG.</p>'].join('');
+    return html;
+  },
+  getInfoText: function (question) {
+    var header = '<div class="prom-question x-component x-title x-form-fieldset-title x-dock-item x-docked-top"><div class="x-innerhtml">' + question.get('PrefixText') + '</div></div>';
+    var html = header + '<div class="prom-info"><p>' + question.get('SuffixText') + '</p></div>';
     return html;
   }
 });

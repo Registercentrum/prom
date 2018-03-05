@@ -34,6 +34,11 @@
     visibility: hidden;
 }
 
+.prom-info {
+    padding: 8px;
+    color: var(--highlight-color);
+}
+
 @media screen and (max-width: 600px) {
     .prom-summary-shown .prom-nav-forward, .prom-summary-shown .prom-nav-back {
         width: 50px;
