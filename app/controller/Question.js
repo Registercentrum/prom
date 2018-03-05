@@ -88,7 +88,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     if (domain.IsEnumerated) {
       var store = Ext.create('PublicRegistrator.store.Domain');
       store.setDomainUrl(view.config.baseUrl, domain.DomainID, view.config.apikey);
-      store.load(function () {self.buildSelectQuestion(store, columnName, domain, config, updateMyValue, validateMe, fieldset);});
+      store.load(function () {self.buildSelectQuestion(store, columnName, domain, config, updateMyValue, validateMe, fieldset, question);});
     } else {
       switch (true) {
       case (domain.DomainID === 1015): // Boolean
@@ -164,7 +164,7 @@ Ext.define('PublicRegistrator.controller.Question', {
  *     ######  ######## ######## ########  ######     ##
  */
 
-  buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset) {
+  buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset, question) {
     var RadioSelectDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
     var isRadioSelect = RadioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
     var isDropdown = !isRadioSelect;
@@ -225,6 +225,11 @@ Ext.define('PublicRegistrator.controller.Question', {
           });
         }
       }
+
+      if (!question.data.IsMandatory) {
+        qOptions.push({text: '(Inget svar)', value: null});
+      }
+
       field = Ext.create('Ext.field.Select', Ext.apply(config, {
         options: qOptions,
         placeholder: 'Tryck här för att välja alternativ ....'
