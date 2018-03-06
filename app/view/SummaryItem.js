@@ -31,7 +31,7 @@
         cls: 'prom-summary-item-link',
         iconCls: 'x-fa fa-angle-left',
         iconAlign: 'left',
-        text: 'Ändra svaret',
+        text: 'Ändra',
         handler: 'onNavigationToQuestion'
       }
     ]

@@ -24,6 +24,12 @@
 .prom-summary-item-link .x-fa {
     padding-bottom: 3px;
 }
+.prom-summary-item .x-button.x-has-text .x-inner-el {
+    padding: 5px 0;
+}
+.prom-summary-item .x-button.x-has-text.x-icon-align-left .x-icon-el {
+    margin: 0;
+}
 .prom-summary-item-response {
     margin-top:5px;
     font-weight: bold;

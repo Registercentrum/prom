@@ -16,7 +16,6 @@ Ext.define('PublicRegistrator.Application', {
     if (token !== '') {
       // publicRegistrator.init({ token: token, APIKey: apikey, baseURL: baseURL });
       Ext.Viewport.setCls('hidden');
-      console.timeStamp('application');
       Ext.Viewport.add(Ext.create('PublicRegistrator.view.Survey', {baseUrl: baseURL, token: token, apikey: apikey}));
     } else {
       Ext.Viewport.add(Ext.create('PublicRegistrator.view.Login'));
