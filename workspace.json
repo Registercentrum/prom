@@ -4,9 +4,7 @@
      */
     "apps": [
         "",
-        "packages/local/Prom/.sencha/temp/Themer",
-        "packages/local/Cyan/.sencha/temp/Themer",
-        "packages/local/CyanToo/.sencha/temp/Themer"
+        "packages/local/Prom/.sencha/temp/Themer"
     ],
 
     /**
