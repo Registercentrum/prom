@@ -29,11 +29,13 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var backButton = this.lookup('backButton');
     var forwardButton = this.lookup('forwardButton');
     var summaryButton = this.lookup('summaryButton');
+    var titleBar = this.lookup('surveyTitle');
 
     var atIntro = container.getActiveIndex() === 0;
     var atSummary = container.getActiveIndex() === container.getInnerItems().length - 1;
 
     atIntro ? backButton.addCls('prom-nav-hidden') : backButton.removeCls('prom-nav-hidden');
+    atIntro ? titleBar.show() : titleBar.hide();
     atSummary ? forwardButton.addCls('prom-nav-hidden') : forwardButton.removeCls('prom-nav-hidden');
     atSummary ? summaryButton.addCls('prom-nav-hidden') : summaryButton.removeCls('prom-nav-hidden');
 

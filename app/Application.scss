@@ -1,8 +1,31 @@
 $enable-font-awesome: dynamic(true);
+$base-dark-color: #00838f;
+// 00838f darkest
+// 0097a7 darker
+// 00acc1 dark
+// 4dd0e1 lighter
+// 00bcd4 lightest
+
+// Reds
+// BA274A
+// 931F1D
+// 89043D
+// D81159
+// CA1551
+// B80138 !
+
+// Yellows
+// F0F3BD
+
+// main background
+// powderblue
+// darkred
+// gainsboro
+// 
     
 html, body {
     height: 100%;
-    background-color: $base-dark-color;
+    background-color: #fafafa;
     cursor: pointer;
 }
 .hidden {
@@ -44,7 +67,7 @@ html, body {
 }
 
 .validationInfo {
-    color: red;
+    color: #B80138;
 }
 div.horizontalRule {
     min-height: 1px;
@@ -121,7 +144,7 @@ div.horizontalRule {
   width:80px;
 }
 .selected {
-  background-color: red;
+  background-color: #B80138;
 }
 .vasNumberContainer {
   height: 340px;

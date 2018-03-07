@@ -92,6 +92,7 @@
     {
       xtype: 'titlebar',
       id: 'formTitlebar',
+      reference: 'surveyTitle',
       title: 'Formulär',
       docked: 'top'
     }
