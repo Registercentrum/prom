@@ -154,6 +154,70 @@ Ext.define('PublicRegistrator.controller.Question', {
     return view;
   },
 
+  buildQuestionText: function (q) {
+    var text;
+    var mappedTo;
+    var prefixText = q.get('PrefixText');
+    var suffixText = q.get('SuffixText');
+    var isMandatory = q.get('IsMandatory');
+
+    prefixText = prefixText !== null ? prefixText.trim() : '';
+    suffixText = suffixText !== null ? suffixText.trim() : '';
+    var mandatoryText = isMandatory ? '*' : '';
+
+    if (prefixText === '') {
+      mappedTo = q.get('MappedTo');
+      mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
+      switch (mappedTo) {
+      case 'SubjectKey':
+        text = 'Personnummer';
+        break;
+      case 'UnitCode':
+        text = 'VårdenhetsID';
+        break;
+      case 'EventDate':
+        text = 'Händelsedag';
+        break;
+      default:
+        text = 'Frågetext saknas';
+      }
+    } else {
+      text = prefixText;
+    }
+
+    if (suffixText !== '') { text = text + ' (' + suffixText + ')';}
+    text += mandatoryText;
+    return text;
+  },
+
+  addQuestionScripts(question) {
+    var controlScript = question.get('ControlScript');
+    var validationScript = question.get('ValidationScript');
+
+    if (controlScript !== null) {
+      if (controlScript.indexOf('Parent') === -1) {
+        var cf = new Function(controlScript); // eslint-disable-line no-new-func
+        controlFunctions.push(cf);
+      }
+    }
+
+    if (validationScript !== null) {
+      if (validationScript.indexOf('Parent') === -1) {
+        var vf = new Function(validationScript); // eslint-disable-line no-new-func
+        validationFunctions.push({
+          columnName: question.get('ColumnName'),
+          validationFunction: vf
+        });
+      }
+    }
+  },
+
+  init: function () {
+    var config = this.getView().config;
+    if (config.isInfo) return;
+    this.buildQuestion(config.questionData, config.index, config.numberOfQuestions, config.meta);
+  },
+
   /**
  *     ######  ######## ##       ########  ######  ########
  *    ##    ## ##       ##       ##       ##    ##    ##
@@ -241,67 +305,6 @@ Ext.define('PublicRegistrator.controller.Question', {
     field.on('change', validateMe, field, {});
 
     fieldset.add(field);
-  },
-
-  buildQuestionText: function (q) {
-    var text;
-    var mappedTo;
-    var prefixText = q.get('PrefixText');
-    var suffixText = q.get('SuffixText');
-
-    prefixText = prefixText !== null ? prefixText.trim() : '';
-    suffixText = suffixText !== null ? suffixText.trim() : '';
-
-    if (prefixText === '') {
-      mappedTo = q.get('MappedTo');
-      mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
-      switch (mappedTo) {
-      case 'SubjectKey':
-        text = 'Personnummer';
-        break;
-      case 'UnitCode':
-        text = 'VårdenhetsID';
-        break;
-      case 'EventDate':
-        text = 'Händelsedag';
-        break;
-      default:
-        text = 'Frågetext saknas';
-      }
-    } else {
-      text = prefixText;
-    }
-
-    if (suffixText !== '') { text = text + ' (' + suffixText + ')'; }
-    return text;
-  },
-
-  addQuestionScripts(question) {
-    var controlScript = question.get('ControlScript');
-    var validationScript = question.get('ValidationScript');
-
-    if (controlScript !== null) {
-      if (controlScript.indexOf('Parent') === -1) {
-        var cf = new Function(controlScript); // eslint-disable-line no-new-func
-        controlFunctions.push(cf);
-      }
-    }
-
-    if (validationScript !== null) {
-      if (validationScript.indexOf('Parent') === -1) {
-        var vf = new Function(validationScript); // eslint-disable-line no-new-func
-        validationFunctions.push({
-          columnName: question.get('ColumnName'),
-          validationFunction: vf
-        });
-      }
-    }
-  },
-
-  init: function () {
-    var config = this.getView().config;
-    if (config.isInfo) return;
-    this.buildQuestion(config.questionData, config.index, config.numberOfQuestions, config.meta);
   },
 
   /**

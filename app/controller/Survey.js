@@ -150,6 +150,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.config = this.getView().config;
     Ext.util.Format.decimalSeparator = ',';
     this.initInvitation(this.buildForm);
+    Ext.apply(Ext.Picker.prototype.defaultConfig, {cancelButton: 'Avbryt', doneButton: 'Klar'});
   },
 
   initInvitation: function (callback) {

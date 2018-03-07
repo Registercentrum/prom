@@ -1,5 +1,5 @@
-.prom-summary-item > div > div {
-    background-color: #f0f0f0;
+.prom-summary-item {
+    background-color: white;
     margin-bottom: 20px;
 }
 .prom-summary-item-text {
@@ -8,7 +8,7 @@
 }
 .prom-summary-item-title {
     text-align: left;
-    background-color: #2196f3;
+    background-color: $base-color;
     color: white;
     padding: 5px;
     margin-bottom: 15px;

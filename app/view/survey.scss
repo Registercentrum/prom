@@ -1,3 +1,5 @@
+$toolbar-background-color: $base-color;
+
 .prom-start-page {
     padding: 16px;
 }
@@ -8,8 +10,11 @@
 }
 
 .prom-nav > div {
-    padding: 6px 0px !important;
+    padding: 0px !important;
     margin: 0;
+}
+.prom-nav .x-button, .prom-nav .x-button .x-icon-el {
+    color: white;
 }
 
 .prom-nav-summary {
