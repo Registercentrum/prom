@@ -210,7 +210,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
         return;
       }
       if (question.data.Domain.DomainID === 1044) {
-        var pnInfo = self.buildInfoPanel(self.getVASInfo(i, numberOfQuestions));
+        var pnInfo = self.buildInfoPanel(self.getVASInfo(i - offset, numberOfQuestions));
         formView.add(pnInfo);
       }
       // var pnQuestion = self.buildQuestion(question, i, numberOfQuestions, appMetaForm, self);
