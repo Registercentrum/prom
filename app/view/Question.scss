@@ -8,3 +8,24 @@
     margin-bottom: 0;
     text-align: center;
 }
+.x-checkboxfield.x-checked .x-box-label-el {
+    color: $base-color;
+}
+
+.x-big .x-checkboxfield .x-box-label-el {
+    white-space: normal;
+}
+.x-checkboxfield .x-icon-el {
+    color: slategray;
+}
+.x-radiofield {
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+.x-radiofield .x-icon-el:before, .x-big .x-checkboxfield .x-icon-el:before {
+    font-size: 22px;
+}
+
+.x-field.x-body-align-end > * > .x-body-el {
+    align-items: flex-start;
+}

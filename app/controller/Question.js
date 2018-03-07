@@ -229,30 +229,23 @@ Ext.define('PublicRegistrator.controller.Question', {
  */
 
   buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset, question) {
-    var RadioSelectDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
-    var isRadioSelect = RadioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+    var radioSelectDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
+    var isRadioSelect = radioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
     var isDropdown = !isRadioSelect;
     var field;
     var dv = store.getAt(0).getData().DomainValues;
     NameMap[columnName] = {};
 
     if (isRadioSelect) {
-      var radios = document.createElement('div');
-      field = Ext.create('Ext.field.Field', Ext.apply(config, {
-        cls: 'prom-radio',
-        html: radios,
-        placeholder: 'Skriv in ett decimaltal, 3 decimaler'
-      }));
+      field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue(value) { this._value = value;}, getValue() { return this._value;}, hidden: true});
+      fieldset.add(field);
       var onRadioclick = function () {
-        var checked = document.querySelector('input[name="' + columnName + '"]:checked');
-        var inputs = document.querySelectorAll('input[name="' + columnName + '"]');
-        inputs.forEach(function (node) {node.parentNode.className = '';});
-        if (checked.value === field.getValue()) {
-          checked.checked = false;
+        var checked = this; // Ext.ComponentQuery.query('#radio').filter(function (radio) {return radio.getChecked();})[0];
+        if (checked && checked.getChecked() === field.getValue()) {
+          checked.setChecked(false);
           field.setValue(null);
         } else {
-          field.setValue(checked.value);
-          checked.parentNode.className = 'checked';
+          field.setValue(checked.getValue());
         }
 
         updateMyValue.bind(field)();
@@ -260,23 +253,30 @@ Ext.define('PublicRegistrator.controller.Question', {
         validationFunction.bind(field)();
         validateMe.bind(field)();
       };
+
       for (var j = 0; j < dv.length; j++) {
         NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
         if (dv[j].IsActive) {
-          var label = document.createElement('label');
-          label.innerHTML = dv[j].ValueName;
-          var radio = document.createElement('input');
-          radio.setAttribute('type', 'radio');
-          radio.setAttribute('name', columnName);
-          radio.setAttribute('value', dv[j].ValueCode);
-          radio.onclick = onRadioclick;
-          label.appendChild(radio);
-          radios.appendChild(label);
-          if (j !== dv.length) {
-            radios.appendChild(document.createElement('hr'));
-          }
+          var radio = Ext.create('Ext.field.Radio', {
+            name: columnName,
+            boxLabel: dv[j].ValueName,
+            value: dv[j].ValueCode,
+            itemId: 'radio'
+          });
+          radio.on('check', onRadioclick);
+          fieldset.add(radio);
         }
       }
+
+      fieldset.add(
+        Ext.create('Ext.field.Radio', {
+          name: columnName,
+          boxLabel: 'Föredrar att inte svara',
+          value: '',
+          itemId: 'radio',
+          listeners: { check: onRadioclick}
+        })
+      );
     }
     if (isDropdown) {
       var qOptions = [];
