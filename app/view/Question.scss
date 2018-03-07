@@ -1,5 +1,5 @@
 .prom-question {
-    margin: 25px 0 0 0;
+    margin: 10px 0 0 0;
 }
 .prom-question-validation {
     margin-left:auto !important;
@@ -7,6 +7,11 @@
     margin-top: 0;
     margin-bottom: 0;
     text-align: center;
+}
+.prom-question-label {
+    font-size: 12px;
+    line-height: 16px;
+    margin-bottom: 10px;
 }
 .x-checkboxfield.x-checked .x-box-label-el {
     color: $base-color;
@@ -24,6 +29,10 @@
 }
 .x-radiofield .x-icon-el:before, .x-big .x-checkboxfield .x-icon-el:before {
     font-size: 22px;
+}
+
+.x-radiofield .x-box-wrap-el, .x-radiofield .x-box-wrap-el label {
+    width: 100%;
 }
 
 .x-field.x-body-align-end > * > .x-body-el {

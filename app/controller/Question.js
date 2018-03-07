@@ -230,13 +230,13 @@ Ext.define('PublicRegistrator.controller.Question', {
 
   buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset, question) {
     var radioSelectDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
-    var isRadioSelect = radioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+    var isRadioSelect = Ext.os.deviceType === 'Desktop' || radioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
     var isDropdown = !isRadioSelect;
     var field;
     var dv = store.getAt(0).getData().DomainValues;
     NameMap[columnName] = {};
-
     if (isRadioSelect) {
+      Ext.os.deviceType === 'Desktop' && fieldset.add(Ext.create('Ext.Label', {html: this.buildQuestionText(question), cls: 'prom-question-label' }));
       field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue(value) { this._value = value;}, getValue() { return this._value;}, hidden: true});
       fieldset.add(field);
       var onRadioclick = function () {
