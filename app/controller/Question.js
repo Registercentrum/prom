@@ -289,10 +289,11 @@ Ext.define('PublicRegistrator.controller.Question', {
           });
         }
       }
-
+      
       if (!question.data.IsMandatory) {
-        qOptions.push({text: '(Inget svar)', value: null});
+        qOptions.push({text: '(Inget svar)', value: ''});
       }
+      
 
       field = Ext.create('Ext.field.Select', Ext.apply(config, {
         options: qOptions,

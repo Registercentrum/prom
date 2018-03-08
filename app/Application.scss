@@ -144,8 +144,8 @@ div.horizontalRule {
   text-align: center;
   width:80px;
 }
-.selected {
-  background-color: #B80138;
+.selected, .selected div {
+  background-color: red !important;
 }
 .vasNumberContainer {
   height: 340px;

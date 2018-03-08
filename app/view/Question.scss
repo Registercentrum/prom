@@ -25,6 +25,10 @@
     margin-top: 0 !important;
     padding-bottom: 0 !important;
 }
+.x-checkboxfield .x-icon-el {
+    height: 20px;
+    width: 20px;
+}
 .x-radiofield .x-icon-el:before, .x-big .x-checkboxfield .x-icon-el:before {
     font-size: 22px;
 }
@@ -36,3 +40,25 @@
 .x-field.x-body-align-end > * > .x-body-el {
     align-items: flex-start;
 }
+.x-big .x-field:not(.x-field-solo).x-layout-auto-item, .x-big .x-field:not(.x-field-solo).x-layout-vbox-item {
+    margin-top: 10px;
+    padding-bottom: 10px;
+    min-height: 40px;
+}
+
+.x-big .x-checkboxfield .x-box-label-el {
+    font-size: 12px;
+    line-height: 16px;
+    padding: 0 0 0 10px;
+}
+
+.x-button.x-has-text.x-icon-align-right .x-icon-el {
+    margin: 0 !important;
+}
+/*
+.x-checkboxfield .x-box-label-el {
+    white-space: normal;
+    display: flex;
+    align-items: center;
+}
+*/
