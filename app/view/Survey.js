@@ -14,7 +14,6 @@
       reference: 'regform',
       title: 'Formulärinmatning',
       id: 'registrationform',
-      layout: 'card',
       fullscreen: false,
       margin: 0,
       direction: 'horizontal',
