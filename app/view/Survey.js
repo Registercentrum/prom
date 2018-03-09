@@ -19,7 +19,7 @@
       direction: 'horizontal',
       indicator: true,
       listeners: {
-        beforeactiveitemchange: 'beforeNavigation',
+        // beforeactiveitemchange: 'beforeNavigation',
         activeitemchange: 'onNavigation'
       },
       items: [

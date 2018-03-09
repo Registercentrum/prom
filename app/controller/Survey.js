@@ -11,6 +11,14 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   onNavigation: function (container, newCard, oldCard) {
+    var valid = this.beforeNavigation(container, newCard, oldCard);
+    if (!valid) {
+      var newIndex = container.getInnerItems().indexOf(newCard);
+      var oldIndex = container.getInnerItems().indexOf(oldCard);
+      var goingForward = newIndex > oldIndex;
+      goingForward && this.onNavigationBack();
+      !goingForward && this.onNavigationForward();
+    }
     this.skipHiddenQuestions(container, newCard, oldCard);
     this.hideInactiveButtons(container);
   },
