@@ -29,7 +29,7 @@ Ext.define('PublicRegistrator.Application', {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
   },
 
-  getApiKey(url) {
+  getApiKey: function (url) {
     return !(url === 'rc-utv.rcvg.local' || url === 'demo.registercentrum.se') ? 'r-NYROaDruQ=' : 'Yj0IKgS-VQQ=';
   }
 });

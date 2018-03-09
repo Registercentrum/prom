@@ -1,5 +1,4 @@
-﻿
-// Global this application START
+﻿// Global this application START
 
 var Current = {}; // lagrar data om det aktiva formuläret
 var NameMap = {};
@@ -54,6 +53,7 @@ var Global = {
     if (v === null || v === undefined) {
       return null;
     }
+
     var c = v.indexOf('T') >= 0 ? v.split('T') : v.split(' ');
     var d = c[0] && c[0].split('-');
     var t = c[1] && c[1].split(':');
@@ -89,6 +89,8 @@ var Global = {
     if (v === null || v === '') {
       return true;
     }
+    if (typeof v === 'string') { v = v.replace(/[^ -~]/g, ''); }
+
     switch (d) {
     case 1015:
       return (v == 'true' || v == 'false' || v == 1 || v == 0) ? true : 'Logiskt värde förväntades.';

@@ -29,7 +29,7 @@ Ext.define('PublicRegistrator.controller.Login', {
     this.displayValidation(validation, errorLabel);
   },
 
-  displayValidation(validation, errorLabel) {
+  displayValidation: function (validation, errorLabel) {
     if ( validation !== true && this.showInstantValidation) {
       errorLabel.setData({ validationInfo: validation });
     } else {

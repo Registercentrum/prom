@@ -17,7 +17,6 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
   skipHiddenQuestions: function (container, newCard, oldCard) {
     if (!newCard.isHiddenByScript) return;
-
     var newIndex = container.getInnerItems().indexOf(newCard);
     var oldIndex = container.getInnerItems().indexOf(oldCard);
     var goingForward = newIndex > oldIndex;
@@ -65,6 +64,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var currentIndex = survey.getInnerItems().indexOf(survey.getActiveItem());
     var nextQuestion = survey.getInnerItems()[currentIndex + 1];
     this.updateAnswer(survey.getActiveItem());
+    // survey.next();
     survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'left' });
   },
 
@@ -98,7 +98,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.updateSummaryItem(name, value);
   },
 
-  updateSummaryItem(name, value) {
+  updateSummaryItem: function (name, value) {
     var answer = (value !== null && typeof NameMap[name] !== 'undefined') ? NameMap[name][value] : value;
     answer = answer ? answer : 'Inget svar har angetts';
 
@@ -235,7 +235,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     Ext.getCmp('ext-viewport').removeCls('hidden');
   },
 
-  handleInvitationErrors(invitation) {
+  handleInvitationErrors: function (invitation) {
     var replyStatus = invitation.get('ReplyStatus');
     var errorMessage;
 

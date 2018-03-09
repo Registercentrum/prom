@@ -23,7 +23,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     return view.isValid ? true : view.validationMessage;
   },
 
-  setValidationMessages(fieldName) {
+  setValidationMessages: function (fieldName) {
     var view = this.getView();
     var questionValidationInfo = this.lookup('validation');
     var summaryValidationInfo = Ext.getCmp('summaryFieldset').getComponent(fieldName).getComponent('validationInfo');
@@ -60,6 +60,7 @@ Ext.define('PublicRegistrator.controller.Question', {
 
     var updateMyValue = function () {
       var value = this.getValue();
+
       if (value instanceof Date) {
         value = value.toLocaleDateString('sv-SE');
       }
@@ -190,7 +191,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     return text;
   },
 
-  addQuestionScripts(question) {
+  addQuestionScripts: function (question) {
     var controlScript = question.get('ControlScript');
     var validationScript = question.get('ValidationScript');
 
@@ -237,7 +238,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     NameMap[columnName] = {};
     if (isRadioSelect) {
       Ext.os.deviceType === 'Desktop' && fieldset.add(Ext.create('Ext.Label', {html: this.buildQuestionText(question), cls: 'prom-question-label' }));
-      field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue(value) { this._value = value;}, getValue() { return this._value;}, hidden: true});
+      field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue: function (value) { this._value = value;}, getValue: function () { return this._value;}, hidden: true});
       fieldset.add(field);
       var onRadioclick = function () {
         var checked = this; // Ext.ComponentQuery.query('#radio').filter(function (radio) {return radio.getChecked();})[0];
@@ -289,11 +290,10 @@ Ext.define('PublicRegistrator.controller.Question', {
           });
         }
       }
-      
+
       if (!question.data.IsMandatory) {
         qOptions.push({text: '(Inget svar)', value: ''});
       }
-      
 
       field = Ext.create('Ext.field.Select', Ext.apply(config, {
         options: qOptions,
