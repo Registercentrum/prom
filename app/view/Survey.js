@@ -16,11 +16,13 @@
       id: 'registrationform',
       fullscreen: false,
       margin: 0,
+      layout: 'card',
       direction: 'horizontal',
       indicator: true,
       listeners: {
         // beforeactiveitemchange: 'beforeNavigation',
-        activeitemchange: 'onNavigation'
+        activeitemchange: 'onNavigation',
+        foo: 'foo'
       },
       items: [
         {

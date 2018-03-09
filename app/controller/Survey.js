@@ -9,18 +9,25 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.validate();
     return oldCard.isValid;
   },
-
+  foo: function () {
+    this.onNavigationBack();
+  },
   onNavigation: function (container, newCard, oldCard) {
     var valid = this.beforeNavigation(container, newCard, oldCard);
     if (!valid) {
       var newIndex = container.getInnerItems().indexOf(newCard);
       var oldIndex = container.getInnerItems().indexOf(oldCard);
       var goingForward = newIndex > oldIndex;
-      goingForward && this.onNavigationBack();
+      if (goingForward) {
+        var survey = this.lookup('regform');
+        var me = this;
+        setTimeout(function () {me.foo();}, 200);
+      }
       !goingForward && this.onNavigationForward();
+    } else {
+      this.skipHiddenQuestions(container, newCard, oldCard);
+      this.hideInactiveButtons(container);
     }
-    this.skipHiddenQuestions(container, newCard, oldCard);
-    this.hideInactiveButtons(container);
   },
 
   skipHiddenQuestions: function (container, newCard, oldCard) {
