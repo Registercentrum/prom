@@ -2,11 +2,15 @@
     margin: 20px 0 0 0;
 }
 .prom-question-validation {
+    display: none;
+}
+.prom-question-validation.validated {
     margin-left:auto !important;
     margin-right:auto !important;
     margin-top: 0;
     margin-bottom: 0;
     text-align: center;
+    display: initial;
 }
 .prom-question-label {
     margin-bottom: 10px;

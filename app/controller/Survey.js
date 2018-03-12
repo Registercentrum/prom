@@ -7,6 +7,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.updateAnswer(oldCard);
     oldCard.validate();
     this.validate();
+    oldCard.down('label').setCls('prom-question-validation validated');
     return oldCard.isValid;
   },
   onNavigation: function (container, newCard, oldCard) {
@@ -171,7 +172,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.config = this.getView().config;
     Ext.util.Format.decimalSeparator = ',';
     this.initInvitation(this.buildForm);
-    Ext.apply(Ext.Picker.prototype.defaultConfig, {cancelButton: 'Avbryt', doneButton: 'Klar'});
+    Ext.apply(Ext.picker.Date.prototype.defaultConfig, {cancelButton: 'Avbryt', doneButton: 'Klar'});
   },
 
   initInvitation: function (callback) {

@@ -102,14 +102,9 @@ Ext.define('PublicRegistrator.controller.Question', {
         field = Ext.create('Ext.field.TextArea', Ext.apply(config, {placeholder: 'Skriv svar här'}));
         break;
       case (domain.DomainID === 1030):
-        field = Ext.create('Ext.field.DatePicker', Ext.apply(config, { value: new Date(), dateFormat: 'Y-m-d', useTitles: true, yearText: 'År', monthText: 'Månad', dayText: 'Dag',
-          error: {
-            errorTarget: 'bottom'
-          },
-          validators: function () { updateMyValue.call(this); return validateMe.call(this); },
-          doneButton: {
-            ui: 'Klar!'
-          }
+        field = Ext.create('Ext.field.Date', Ext.apply(config, { value: new Date(), dateFormat: 'Y-m-d'
+        // useTitles: true, yearText: 'År', monthText: 'Månad', dayText: 'Dag', validationMessage: 'foo'
+          // validators: function () { updateMyValue.call(this); return validateMe.call(this); },
         }));
         break;
       case (domain.DomainID === 1033):

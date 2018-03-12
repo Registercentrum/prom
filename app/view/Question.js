@@ -8,6 +8,7 @@
   validationMessage: null,
   isValid: false,
   isInfo: false,
+  showValidation: false,
 
   config: {
     questionData: {},
