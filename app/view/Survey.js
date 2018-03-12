@@ -21,8 +21,7 @@
       indicator: true,
       listeners: {
         // beforeactiveitemchange: 'beforeNavigation',
-        activeitemchange: 'onNavigation',
-        foo: 'foo'
+        activeitemchange: 'onNavigation'
       },
       items: [
         {

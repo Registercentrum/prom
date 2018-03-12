@@ -9,9 +9,6 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.validate();
     return oldCard.isValid;
   },
-  foo: function () {
-    this.onNavigationBack();
-  },
   onNavigation: function (container, newCard, oldCard) {
     var valid = this.beforeNavigation(container, newCard, oldCard);
     if (!valid) {
@@ -79,7 +76,6 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var currentIndex = survey.getInnerItems().indexOf(survey.getActiveItem());
     var nextQuestion = survey.getInnerItems()[currentIndex + 1];
     this.updateAnswer(survey.getActiveItem());
-    // survey.next();
     survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'left' });
   },
 
