@@ -230,14 +230,16 @@ Ext.define('PublicRegistrator.controller.Question', {
  */
 
   buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset, question) {
-    var radioSelectDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
-    var isRadioSelect = Ext.os.deviceType === 'Desktop' || radioSelectDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+    var Eq5dDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
+    var isDesktop = Ext.os.deviceType === 'Desktop';
+    var isEq5d = Eq5dDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+    var isRadioSelect = true || isDesktop || isEq5d;
     var isDropdown = !isRadioSelect;
     var field;
     var dv = store.getAt(0).getData().DomainValues;
     NameMap[columnName] = {};
     if (isRadioSelect) {
-      Ext.os.deviceType === 'Desktop' && fieldset.add(Ext.create('Ext.Label', {html: this.buildQuestionText(question), cls: 'prom-question-label' }));
+      fieldset.add(Ext.create('Ext.Label', { html: this.buildQuestionText(question), cls: 'prom-question-label' }));
       field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue: function (value) { this._value = value;}, getValue: function () { return this._value;}, hidden: true});
       fieldset.add(field);
       var onRadioclick = function () {
@@ -254,11 +256,12 @@ Ext.define('PublicRegistrator.controller.Question', {
         validationFunction.bind(field)();
         validateMe.bind(field)();
       };
-
+      var cssClasses = isEq5d && !isDesktop ? 'prom-long-answer' : '';
       for (var j = 0; j < dv.length; j++) {
         NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
         if (dv[j].IsActive) {
           var radio = Ext.create('Ext.field.Radio', {
+            cls: cssClasses,
             name: columnName,
             boxLabel: dv[j].ValueName,
             value: dv[j].ValueCode,
@@ -272,6 +275,7 @@ Ext.define('PublicRegistrator.controller.Question', {
       fieldset.add(
         Ext.create('Ext.field.Radio', {
           name: columnName,
+          cls: cssClasses,
           boxLabel: 'Föredrar att inte svara',
           value: '',
           itemId: 'radio',

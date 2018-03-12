@@ -61,7 +61,11 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var currentIndex = survey.getInnerItems().indexOf(survey.getActiveItem());
     var nextQuestion = survey.getInnerItems()[currentIndex - 1];
     this.updateAnswer(survey.getActiveItem());
-    survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'right' });
+    if (Ext.isIE) {
+      survey.setActiveItem(nextQuestion);  
+    } else {
+      survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'right' });
+    }
   },
 
   onNavigationSummary: function () {
@@ -76,7 +80,11 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var currentIndex = survey.getInnerItems().indexOf(survey.getActiveItem());
     var nextQuestion = survey.getInnerItems()[currentIndex + 1];
     this.updateAnswer(survey.getActiveItem());
-    survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'left' });
+    if (Ext.isIE) {
+      survey.setActiveItem(nextQuestion);  
+    } else {
+      survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'left' });
+    }
   },
 
   validate: function () {
