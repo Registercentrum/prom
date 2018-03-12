@@ -29,7 +29,7 @@ Ext.define('PublicRegistrator.view.Login', {
             label: 'Personnummer',
             labelWrap: true,
             name: 'subject',
-            placeholder: 'Skriv svar här',
+            placeholder: 'Skriv svar här (12 siffror)',
             labelWidth: '60%',
             labelAlign: 'top',
             listeners: {

@@ -34,7 +34,6 @@ Ext.define('PublicRegistrator.controller.Login', {
       errorLabel.setData({ validationInfo: validation });
     } else {
       errorLabel.setData({ validationInfo: '' });
-      this.lookup('pinCode').focus(true);
     }
   },
 
