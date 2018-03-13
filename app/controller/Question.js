@@ -31,6 +31,8 @@ Ext.define('PublicRegistrator.controller.Question', {
     var info = view.isValid ? '' : (view.mandatoryMessage || view.validationMessage);
     questionValidationInfo.setData({ validationInfo: info });
     summaryValidationInfo.setData({ validationInfo: info });
+    var field = this.lookup('question');
+    view.isValid || !view.showValidation ? field.removeCls('x-invalid') : field.addCls('x-invalid');
   },
 
   /**

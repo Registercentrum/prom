@@ -18,6 +18,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
       var goingForward = newIndex > oldIndex;
       var me = this;
       oldCard.isBouncing = true;
+      oldCard.showValidation = true;
       if (goingForward) {
         setTimeout(function () {me.onNavigationBack();}, 50);
       } else {
