@@ -71,11 +71,12 @@
               html: [
                 '<h2>Välkommen att svara på enkätfrågorna!</h2>',
                 'Frågorna visas en och en, gå till nästa fråga genom att trycka på <b>Nästa</b> ',
-                'eller svepa i sidled över skärmen. ',
+                'eller dra i sidled över skärmen. ',
+                'Beroende på vad du svarar kan det hända att vissa frågor automatiskt hoppas över. ',
                 'Efter den sista frågan visas en sammanställning över dina svar. ',
                 'Du kan gå tillbaka och ändra svar på tidigare frågor. ',
                 'När du är nöjd med svaren, tryck på <b>Skicka in dina svar</b>.',
-                '<br />',
+                '<br /><br />',
                 'Börja svara genom att trycka på <b>Starta</b>.<br />'
               ].join('')
             },

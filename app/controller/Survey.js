@@ -7,10 +7,11 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.updateAnswer(oldCard);
     oldCard.validate();
     this.validate();
-    oldCard.down('label').setCls('prom-question-validation validated');
+    oldCard.down('label') && oldCard.down('label').setCls('prom-question-validation validated');
     return oldCard.isValid;
   },
   onNavigation: function (container, newCard, oldCard) {
+    oldCard.showValidation = true;
     var valid = this.beforeNavigation(container, newCard, oldCard);
     if (!valid) {
       var newIndex = container.getInnerItems().indexOf(newCard);
@@ -18,7 +19,6 @@ Ext.define('PublicRegistrator.controller.Survey', {
       var goingForward = newIndex > oldIndex;
       var me = this;
       oldCard.isBouncing = true;
-      oldCard.showValidation = true;
       if (goingForward) {
         setTimeout(function () {me.onNavigationBack();}, 50);
       } else {
@@ -100,7 +100,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
       if (!questions[i].up().up().isValid) {
         submitButton.setDisabled(true);
         survey.isValid = false;
-        this.presentError('En eller flera av svaren är märkta i rött och behöver ändras innan du kan skicka in dem.');
+        this.presentError('Ett eller flera av svaren är märkta i rött och behöver ändras innan du kan skicka in dem.');
         return;
       }
       this.presentError('');

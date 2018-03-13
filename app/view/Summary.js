@@ -15,7 +15,7 @@
       xtype: 'label',
       itemId: 'saveerror',
       reference: 'errorMessage',
-      tpl: '<div class="prom-summary-error">Felmeddelande: {message}</div>'
+      tpl: '<div class="prom-summary-error">{message}</div>'
     },
     {
       xtype: 'fieldset',
