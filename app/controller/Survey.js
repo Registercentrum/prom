@@ -3,7 +3,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
   alias: 'controller.survey',
 
   beforeNavigation: function (container, newCard, oldCard) {
-    if (typeof oldCard.validate === 'undefined') return true;
+    if (typeof oldCard.validate === 'undefined' || newCard.isBouncing === true) return true;
     this.updateAnswer(oldCard);
     oldCard.validate();
     this.validate();
@@ -17,12 +17,14 @@ Ext.define('PublicRegistrator.controller.Survey', {
       var oldIndex = container.getInnerItems().indexOf(oldCard);
       var goingForward = newIndex > oldIndex;
       var me = this;
+      oldCard.isBouncing = true;
       if (goingForward) {
         setTimeout(function () {me.onNavigationBack();}, 50);
       } else {
         setTimeout(function () {me.onNavigationForward();}, 50);
       }
     } else {
+      oldCard.isBouncing = false;
       this.skipHiddenQuestions(container, newCard, oldCard);
       this.hideInactiveButtons(container);
     }

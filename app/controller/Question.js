@@ -103,7 +103,6 @@ Ext.define('PublicRegistrator.controller.Question', {
         break;
       case (domain.DomainID === 1030):
         field = Ext.create('Ext.field.Date', Ext.apply(config, { value: new Date(), dateFormat: 'Y-m-d'
-        // useTitles: true, yearText: 'År', monthText: 'Månad', dayText: 'Dag', validationMessage: 'foo'
           // validators: function () { updateMyValue.call(this); return validateMe.call(this); },
         }));
         break;
@@ -115,7 +114,6 @@ Ext.define('PublicRegistrator.controller.Question', {
         break;
       case (domain.DomainID === 1040):
         field = Ext.create('Ext.field.Number', Ext.apply(config, { placeholder: 'Skriv in ett heltal'}));
-        // errorTarget: 'under'
         // validators: function (value) { if (this.isBlurring()) { /*updateMyValue.call(f); return validateMe.call(f);*/} else { return true;} }
         break;
       case (domain.DomainID === 1050):
@@ -133,7 +131,7 @@ Ext.define('PublicRegistrator.controller.Question', {
       case (domain.DomainID === 1044):
         field = Ext.create('Ext.field.Field', Ext.apply(config, { html: this.vas(columnName), placeholder: 'Skriv in ett decimaltal, 3 decimaler'}));
         break;
-      case (domain.DomainID === 1080): // Labels
+      case (domain.DomainID === 1080):
         break;
       default:
         field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ' + domain.DomainTitle}));
