@@ -9,6 +9,7 @@ Ext.define('PublicRegistrator.controller.Question', {
       return true;
     }
     var fieldName = this.lookup('question').getName();
+    view.validationMessage = null;
     view.mandatoryMessage = view.isMandatory && !Current[fieldName] ? 'OBS! Denna fråga måste besvaras.' : null;
 
     validationFunction(); // ValidationScripts from database
