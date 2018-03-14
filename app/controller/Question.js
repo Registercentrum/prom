@@ -63,7 +63,7 @@ Ext.define('PublicRegistrator.controller.Question', {
 
     var updateMyValue = function () {
       var value = this.getValue();
-
+      value = !value ? null : value;
       if (value instanceof Date) {
         value = value.toLocaleDateString('sv-SE');
       }
@@ -272,7 +272,7 @@ Ext.define('PublicRegistrator.controller.Question', {
         Ext.create('Ext.field.Radio', {
           name: columnName,
           cls: cssClasses,
-          boxLabel: 'Föredrar att inte svara',
+          boxLabel: 'Kan eller vill inte svara',
           value: '',
           itemId: 'radio',
           listeners: { check: onRadioclick}

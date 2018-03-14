@@ -8,6 +8,24 @@ Ext.define('PublicRegistrator.controller.Survey', {
     oldCard.validate();
     this.validate();
     oldCard.down('label') && oldCard.down('label').setCls('prom-question-validation validated');
+    if (newCard.down('#question') && !newCard.down('#question').getValue()) {
+      if (newCard.down('radio')) {
+        var answers = newCard.down('fieldset').innerItems;
+        answers.forEach(function (answer) {
+          answer.xtype === 'radio' && answer.setChecked(false);
+        });
+      }
+    }
+    newCard.validate && newCard.validate();
+    if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue()) {
+      console.log('obligatory');
+      if (newCard.down('radio')) {
+        var items = newCard.down('fieldset').innerItems;
+        items.forEach(function (answer) {
+          answer.xtype === 'radio' && !answer.getValue() && answer.setHidden(true);
+        });
+      }
+    }
     return oldCard.isValid;
   },
   onNavigation: function (container, newCard, oldCard) {
@@ -17,9 +35,12 @@ Ext.define('PublicRegistrator.controller.Survey', {
       var newIndex = container.getInnerItems().indexOf(newCard);
       var oldIndex = container.getInnerItems().indexOf(oldCard);
       var goingForward = newIndex > oldIndex;
+      var goingFastForward = newIndex > oldIndex + 1;
       var me = this;
       oldCard.isBouncing = true;
-      if (goingForward) {
+      if (goingFastForward) {
+        setTimeout(function () {container.setActiveItem(oldCard);}, 50);
+      } else if (goingForward) {
         setTimeout(function () {me.onNavigationBack();}, 50);
       } else {
         setTimeout(function () {me.onNavigationForward();}, 50);
@@ -66,7 +87,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var nextQuestion = survey.getInnerItems()[currentIndex - 1];
     this.updateAnswer(survey.getActiveItem());
     if (Ext.isIE) {
-      survey.setActiveItem(nextQuestion);  
+      survey.setActiveItem(nextQuestion);
     } else {
       survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'right' });
     }
@@ -85,7 +106,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var nextQuestion = survey.getInnerItems()[currentIndex + 1];
     this.updateAnswer(survey.getActiveItem());
     if (Ext.isIE) {
-      survey.setActiveItem(nextQuestion);  
+      survey.setActiveItem(nextQuestion);
     } else {
       survey.animateActiveItem(nextQuestion, { type: 'slide', direction: 'left' });
     }
@@ -112,8 +133,9 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
   updateAnswer: function (oldCard) {
     var fieldset = oldCard.getComponent('fieldset');
-    var question = fieldset && fieldset.down('#question');
+    var question = fieldset && oldCard.down('#question');
     if (!question) return;
+
     var name = question.getName();
     var value = question.getValue() ? question.getValue() : null;
     if (value && value instanceof Date) value = value.toLocaleDateString('sv-SE');
@@ -176,6 +198,17 @@ Ext.define('PublicRegistrator.controller.Survey', {
     Ext.util.Format.decimalSeparator = ',';
     this.initInvitation(this.buildForm);
     Ext.apply(Ext.picker.Date.prototype.defaultConfig, {cancelButton: 'Avbryt', doneButton: 'Klar'});
+    this.getValidations();
+  },
+
+  getValidations: function () {
+    Ext.Ajax.request({
+      url: '//' + this.config.baseUrl + '/api/configurations/globals',
+      success: function (response) {
+        var global = Ext.decode(response.responseText);
+        Global = eval('(' + global.data.Methods + ')'); // eslint-disable-line no-eval
+      }
+    });
   },
 
   initInvitation: function (callback) {
