@@ -66,6 +66,7 @@ Ext.define('PublicRegistrator.controller.Question', {
       value = !value ? null : value;
       if (value instanceof Date) {
         value = value.toLocaleDateString('sv-SE');
+        value = value.replace(/[^ -~]/g, '');
       }
       Current[columnName] = value;
     };

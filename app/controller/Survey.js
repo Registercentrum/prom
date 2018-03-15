@@ -138,7 +138,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
 
     var name = question.getName();
     var value = question.getValue() ? question.getValue() : null;
-    if (value && value instanceof Date) value = value.toLocaleDateString('sv-SE');
+    if (value && value instanceof Date) {
+      value = value.toLocaleDateString('sv-SE');
+      value = value.replace(/[^ -~]/g, '');
+    }
     Current[name] = value;
     this.updateSummaryItem(name, value);
   },
