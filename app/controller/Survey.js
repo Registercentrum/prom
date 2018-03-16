@@ -7,24 +7,9 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.updateAnswer(oldCard);
     oldCard.validate();
     this.validate();
-    oldCard.down('label') && oldCard.down('label').setCls('prom-question-validation validated');
-    if (newCard.down('#question') && !newCard.down('#question').getValue()) {
-      if (newCard.down('radio')) {
-        var answers = newCard.down('fieldset').innerItems;
-        answers.forEach(function (answer) {
-          answer.xtype === 'radio' && answer.setChecked(false);
-        });
-      }
-    }
-    newCard.validate && newCard.validate();
-    if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue()) {
-      if (newCard.down('radio')) {
-        var items = newCard.down('fieldset').innerItems;
-        items.forEach(function (answer) {
-          answer.xtype === 'radio' && !answer.getValue() && answer.setHidden(true);
-        });
-      }
-    }
+    this.showValidation(oldCard);
+    this.updateCheckedItemsAfterControlScript(newCard);
+    this.hideOptionIfAnswerIsObligatory(newCard);
     return oldCard.isValid;
   },
   onNavigation: function (container, newCard, oldCard) {
@@ -77,6 +62,31 @@ Ext.define('PublicRegistrator.controller.Survey', {
     if (atSummary) {
       summaryButton.setHidden(false);
       container.down('toolbar').addCls('prom-summary-shown');
+    }
+  },
+
+  showValidation(oldCard) {
+    oldCard.down('label') && oldCard.down('label').setCls('prom-question-validation validated');
+  },
+
+  updateCheckedItemsAfterControlScript(newCard) {
+    if (newCard.down('#question') && !newCard.down('#question').getValue() && newCard.down('radio')) {
+      var answers = newCard.down('fieldset').innerItems;
+      answers.forEach(function (answer) {
+        answer.xtype === 'radio' && answer.setChecked(false);
+      });
+    }
+  },
+
+  hideOptionIfAnswerIsObligatory(newCard) {
+    newCard.validate && newCard.validate();
+    if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue()) {
+      if (newCard.down('radio')) {
+        var items = newCard.down('fieldset').innerItems;
+        items.forEach(function (answer) {
+          answer.xtype === 'radio' && !answer.getValue() && answer.setHidden(true);
+        });
+      }
     }
   },
 
@@ -338,7 +348,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   getVASInfo: function (i, n) {
-    var header = '<div class="prom-question x-component x-title x-form-fieldset-title x-dock-item x-docked-top"><div class="x-innerhtml">Fråga ' + i + ' av ' + n + '</div></div>';
+    var header = '<div class="prom-question-intro">Fråga ' + i + ' av ' + n + '</div><div class="prom-question-title">Inför nästa fråga</div>';
     // var header = '<div ="x-innerhtml">Fråga ' + i + ' av ' + n + '</div>';
     var html = [header,
       '<p>− Vi vill veta hur bra eller dålig din hälsa är IDAG.</p>',

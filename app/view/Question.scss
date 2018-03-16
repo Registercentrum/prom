@@ -7,9 +7,10 @@
     font-style: italic;
 }
 .prom-question-title {
-    font-size: 16px/24px;
+    font-size: 15px;
     color: darkslategray;
     padding: 6px 0 4px 0;
+    white-space: normal;
 }
 .prom-question .x-checkboxfield .x-icon-el {
     color: slategray;
@@ -17,6 +18,7 @@
 .prom-question .x-radiofield {
     margin-top: 0 !important;
     padding-bottom: 0 !important;
+    min-height: 30px;
 }
 .prom-question .x-checkboxfield .x-icon-el {
     height: 20px;
@@ -63,6 +65,7 @@
 .prom.x-big .x-checkboxfield .x-box-label-el {
     white-space: normal;
 }
+.prom .x-checkboxfield .x-box-label-el,
 .prom.x-big .x-checkboxfield .x-box-label-el {
     font-size: 14px;
     line-height: 20px;

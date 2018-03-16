@@ -85,6 +85,8 @@ html, body {
 .prom-validation {
     color: #B80138;
 }
-.prom .x-button.x-has-text .x-icon-el {
+.prom .x-button.x-has-text .x-icon-el,
+.prom.x-big .x-button.x-has-text .x-icon-el,
+ {
     margin: 0;
 }

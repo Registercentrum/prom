@@ -12,7 +12,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     view.validationMessage = null;
     view.mandatoryMessage = view.isMandatory && !Current[fieldName] ? 'OBS! Denna fråga måste besvaras.' : null;
 
-    validationFunction(); // ValidationScripts from database
+    validationFunction(); // Registry specific validation scripts from database
 
     if (view.validationMessage === null) {
       var validationMessage = Global.Validate(Current[fieldName], view.domainID); // eslint-disable-line new-cap
