@@ -54,7 +54,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var domain = question.get('Domain');
     var columnName = question.get('ColumnName');
 
-    fieldset.setTitle('Fråga ' + i + ' av ' + numberOfQuestions);
+    fieldset.setTitle('<div class="prom-question-intro">Fråga ' + i + ' av ' + numberOfQuestions + '</div><div class="prom-question-title">' + questionText + '</div>');
     view.questionText = questionText;
     view.isMandatory = question.get('IsMandatory');
     view.setItemId(columnName);
@@ -83,7 +83,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var config = {
       itemId: 'question',
       reference: 'question',
-      label: questionText,
+      // label: questionText,
       labelWrap: true,
       name: columnName,
       labelWidth: '60%',
@@ -236,7 +236,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var dv = store.getAt(0).getData().DomainValues;
     NameMap[columnName] = {};
     if (isRadioSelect) {
-      fieldset.add(Ext.create('Ext.Label', { html: this.buildQuestionText(question), cls: 'prom-question-label' }));
+      // fieldset.add(Ext.create('Ext.Label', { html: this.buildQuestionText(question), cls: 'prom-question-label' }));
       field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue: function (value) { this._value = value;}, getValue: function () { return this._value;}, hidden: true});
       fieldset.add(field);
       var onRadioclick = function () {
