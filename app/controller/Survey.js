@@ -65,11 +65,11 @@ Ext.define('PublicRegistrator.controller.Survey', {
     }
   },
 
-  showValidation(oldCard) {
+  showValidation: function (oldCard) {
     oldCard.down('label') && oldCard.down('label').setCls('prom-question-validation validated');
   },
 
-  updateCheckedItemsAfterControlScript(newCard) {
+  updateCheckedItemsAfterControlScript: function (newCard) {
     if (newCard.down('#question') && !newCard.down('#question').getValue() && newCard.down('radio')) {
       var answers = newCard.down('fieldset').innerItems;
       answers.forEach(function (answer) {
@@ -78,7 +78,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     }
   },
 
-  hideOptionIfAnswerIsObligatory(newCard) {
+  hideOptionIfAnswerIsObligatory: function (newCard) {
     newCard.validate && newCard.validate();
     if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue()) {
       if (newCard.down('radio')) {
@@ -348,7 +348,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   getVASInfo: function (i, n) {
-    var header = '<div class="prom-question-intro">Fråga ' + i + ' av ' + n + '</div><div class="prom-question-title">Inför nästa fråga</div>';
+    var header = '<div class="prom-question prom-question-intro">Fråga ' + i + ' av ' + n + '</div><div class="prom-question-title">Inför nästa fråga</div>';
     // var header = '<div ="x-innerhtml">Fråga ' + i + ' av ' + n + '</div>';
     var html = [header,
       '<p>− Vi vill veta hur bra eller dålig din hälsa är IDAG.</p>',
