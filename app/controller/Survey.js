@@ -18,7 +18,6 @@ Ext.define('PublicRegistrator.controller.Survey', {
     }
     newCard.validate && newCard.validate();
     if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue()) {
-      console.log('obligatory');
       if (newCard.down('radio')) {
         var items = newCard.down('fieldset').innerItems;
         items.forEach(function (answer) {

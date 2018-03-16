@@ -24,7 +24,7 @@
       {
         xtype: 'label',
         itemId: 'validationInfo',
-        tpl: '<span class="validationInfo">{validationInfo}</span>'
+        tpl: '<span class="prom-validation">{validationInfo}</span>'
       },
       {
         xtype: 'button',

@@ -18,7 +18,7 @@ Ext.define('PublicRegistrator.view.Login', {
         },
         reference: 'validationMessageSubjectId',
         cls: 'prom-login-validation',
-        tpl: '<span class="validationInfo">{validationInfo}</span>'
+        tpl: '<span class="prom-validation">{validationInfo}</span>'
       },
       {
         xtype: 'fieldset',
@@ -46,7 +46,7 @@ Ext.define('PublicRegistrator.view.Login', {
         },
         reference: 'validationMessagePinCode',
         cls: 'prom-login-validation',
-        tpl: '<span class="validationInfo">{validationInfo}</span>'
+        tpl: '<span class="prom-validation">{validationInfo}</span>'
       },
       {
         xtype: 'fieldset',
@@ -83,7 +83,7 @@ Ext.define('PublicRegistrator.view.Login', {
             message: ''
           },
           cls: 'prom-login-validation',
-          tpl: '<br/><span class="validationInfo">{message}</span>'
+          tpl: '<br/><span class="prom-validation">{message}</span>'
         }
       }
     ]

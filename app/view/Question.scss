@@ -1,6 +1,20 @@
 .prom-question {
     margin: 20px 0 0 0;
 }
+.prom-question .x-checkboxfield .x-icon-el {
+    color: slategray;
+}
+.prom-question .x-radiofield {
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+.prom-question .x-checkboxfield .x-icon-el {
+    height: 20px;
+    width: 22px;
+}
+.prom-question .x-field.x-body-align-end > * > .x-body-el {
+    align-items: flex-start;
+}
 .prom-question-validation {
     display: none;
 }
@@ -15,54 +29,112 @@
 .prom-question-label {
     margin-bottom: 10px;
 }
-.x-checkboxfield.x-checked .x-box-label-el {
+.prom-long-answer {
+    min-height: 50px !important;
+}
+.prom-question .x-checkboxfield.x-checked .x-box-label-el,
+.prom-question .x-checkboxfield.x-checked .x-icon-el {
     color: $base-color;
 }
-
-.x-big .x-checkboxfield .x-box-label-el {
-    white-space: normal;
-}
-.x-checkboxfield .x-icon-el {
-    color: slategray;
-}
-.x-radiofield {
-    margin-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-.x-checkboxfield .x-icon-el {
-    height: 20px;
-    width: 22px;
-}
-.x-radiofield .x-icon-el:before, .x-big .x-checkboxfield .x-icon-el:before {
-    font-size: 22px;
-}
-
-.x-radiofield .x-box-wrap-el, .x-radiofield .x-box-wrap-el label {
+.prom-question .x-radiofield .x-box-wrap-el, 
+.prom-question .x-radiofield .x-box-wrap-el label {
     width: 100%;
 }
-
-.x-field.x-body-align-end > * > .x-body-el {
-    align-items: flex-start;
+.prom-question .x-radiofield .x-icon-el:before, 
+.prom.x-big .x-checkboxfield .x-icon-el:before {
+    font-size: 22px;
 }
-.x-big .x-field:not(.x-field-solo).x-layout-auto-item, .x-big .x-field:not(.x-field-solo).x-layout-vbox-item {
+.prom.x-big .x-field:not(.x-field-solo).x-layout-auto-item, 
+.prom.x-big .x-field:not(.x-field-solo).x-layout-vbox-item {
     margin-top: 10px;
     padding-bottom: 10px;
     min-height: 35px;
 }
-
-.x-big .x-checkboxfield .x-box-label-el {
+.prom.x-big .x-checkboxfield .x-box-label-el {
+    white-space: normal;
+}
+.prom.x-big .x-checkboxfield .x-box-label-el {
     font-size: 14px;
     line-height: 20px;
     padding: 0 0 0 10px;
 }
 
-.x-button.x-has-text.x-icon-align-right .x-icon-el {
-    margin: 0 !important;
+/*Scale specific styles*/
+.clickableLine {
+    width: 35px;
+    height: 3px;
+    margin-top: 6px;
 }
-/*
-.x-checkboxfield .x-box-label-el {
-    white-space: normal;
+.currentValContainer {
+    text-align: center;
+    background-color: black;
+    color: white;
+    width: 80px;
+}
+.scaleThermometer {
+    margin-top: 6px;
+    width: 40px;
+}
+.scaleInfoContainer {
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    align-items: center;
 }
-*/
+.scaleWithHeader {
+    width: 190px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+.scaleInfoText {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    margin: 0 auto;
+    text-align: center;
+    width:80px;
+}
+.selected, .selected div {
+    background-color: red !important;
+}
+.vasNumberContainer {
+    height: 340px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    width: 60px;
+}
+.line {
+      background-color: black;
+      margin: auto;
+      position: relative;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+              transform: translateY(-50%);
+}
+  
+.scaleContainer {
+    height: 340px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+}

@@ -33,7 +33,7 @@
       xtype: 'label',
       reference: 'validation',
       cls: 'prom-question-validation',
-      tpl: '<span class="validationInfo">{validationInfo}</span>'
+      tpl: '<span class="prom-validation">{validationInfo}</span>'
     }
   ],
 

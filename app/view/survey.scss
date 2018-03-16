@@ -13,7 +13,9 @@ $toolbar-background-color: $base-color;
     padding: 0px !important;
     margin: 0;
 }
-.prom-nav .x-button, .prom-nav .x-button .x-icon-el {
+
+.prom-nav .x-text-el, 
+.prom-nav .x-icon-el {
     color: white;
 }
 
@@ -49,7 +51,8 @@ $toolbar-background-color: $base-color;
 }
 
 @media screen and (max-width: 600px) {
-    .prom-summary-shown .prom-nav-forward, .prom-summary-shown .prom-nav-back {
+    .prom-summary-shown .prom-nav-forward, 
+    .prom-summary-shown .prom-nav-back {
         width: 50px;
     }
     
@@ -58,6 +61,6 @@ $toolbar-background-color: $base-color;
     }    
 }
 
-.x-fa.fa-angle-double-right {
+.prom .x-fa.fa-angle-double-right {
     padding-bottom: 4px;
 }
