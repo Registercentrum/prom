@@ -54,7 +54,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var domain = question.get('Domain');
     var columnName = question.get('ColumnName');
 
-    fieldset.setTitle('<div class="prom-question-intro">Fråga ' + i + ' av ' + numberOfQuestions + '</div><div class="prom-question-title">' + questionText + '</div>');
+    fieldset.setTitle('<div class="prom-question-intro">Fråga ' + i + ' av ' + numberOfQuestions + '</div><div class="prom-question-title">' + questionText + '<span class="hidden">*</span></div>');
     view.questionText = questionText;
     view.isMandatory = question.get('IsMandatory');
     view.setItemId(columnName);
@@ -157,11 +157,9 @@ Ext.define('PublicRegistrator.controller.Question', {
     var mappedTo;
     var prefixText = q.get('PrefixText');
     var suffixText = q.get('SuffixText');
-    var isMandatory = q.get('IsMandatory');
 
     prefixText = prefixText !== null ? prefixText.trim() : '';
     suffixText = suffixText !== null ? suffixText.trim() : '';
-    var mandatoryText = isMandatory ? '*' : '';
 
     if (prefixText === '') {
       mappedTo = q.get('MappedTo');
@@ -184,7 +182,6 @@ Ext.define('PublicRegistrator.controller.Question', {
     }
 
     if (suffixText !== '') { text = text + ' (' + suffixText + ')';}
-    text += mandatoryText;
     return text;
   },
 

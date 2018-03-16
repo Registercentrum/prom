@@ -9,7 +9,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.validate();
     this.showValidation(oldCard);
     this.updateCheckedItemsAfterControlScript(newCard);
-    this.hideOptionIfAnswerIsObligatory(newCard);
+    this.hideOptionIfAnswerIsMandatory(newCard);
     return oldCard.isValid;
   },
   onNavigation: function (container, newCard, oldCard) {
@@ -78,15 +78,14 @@ Ext.define('PublicRegistrator.controller.Survey', {
     }
   },
 
-  hideOptionIfAnswerIsObligatory: function (newCard) {
+  hideOptionIfAnswerIsMandatory: function (newCard) {
     newCard.validate && newCard.validate();
-    if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue()) {
-      if (newCard.down('radio')) {
-        var items = newCard.down('fieldset').innerItems;
-        items.forEach(function (answer) {
-          answer.xtype === 'radio' && !answer.getValue() && answer.setHidden(true);
-        });
-      }
+    if (newCard.validate && !newCard.isValid && !newCard.down('#question').getValue() && newCard.down('radio')) {
+      newCard.down('fieldset').addCls('prom-mandatory');
+      var items = newCard.down('fieldset').innerItems;
+      items.forEach(function (answer) {
+        answer.xtype === 'radio' && !answer.getValue() && answer.setHidden(true);
+      });
     }
   },
 
