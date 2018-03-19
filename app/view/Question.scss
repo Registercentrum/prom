@@ -18,11 +18,11 @@
 .prom-question .x-radiofield {
     margin-top: 0 !important;
     padding-bottom: 0 !important;
-    min-height: 30px;
 }
 .prom-question .x-checkboxfield .x-icon-el {
-    height: 20px;
+    height: 30px;
     width: 22px;
+    cursor: pointer;
 }
 .prom-question .x-field.x-body-align-end > * > .x-body-el {
     align-items: flex-start;
@@ -40,6 +40,9 @@
 }
 .prom-question-label {
     margin-bottom: 10px;
+}
+.prom-long-answer {
+    min-height: 50px !important;
 }
 .prom-long-answer {
     min-height: 50px !important;
@@ -69,7 +72,8 @@
 .prom.x-big .x-checkboxfield .x-box-label-el {
     font-size: 14px;
     line-height: 20px;
-    padding: 0 0 0 10px;
+    padding: 5px 0 5px 10px;
+    cursor: pointer;
 }
 .prom-mandatory .hidden {
     visibility: visible;

@@ -2,6 +2,205 @@ Ext.define('PublicRegistrator.controller.Question', {
   extend: 'Ext.app.ViewController',
   alias: 'controller.question',
 
+  init: function () {
+    var config = this.getView().config;
+    if (config.isInfo) return;
+    this.createQuestion(config.questionData, config.index, config.numberOfQuestions, config.meta);
+  },
+
+  /**
+ *    ########  ##     ## #### ##       ########
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ########  ##     ##  ##  ##       ##     ##
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ##     ## ##     ##  ##  ##       ##     ##
+ *    ########   #######  #### ######## ########
+ */
+
+  createQuestion: function (question, i, numberOfQuestions) {
+    var view = this.getView();
+    var fieldset = view.getComponent('fieldset');
+    var domain = question.get('Domain');
+    var columnName = question.get('ColumnName');
+
+    this.createQuestionScripts(question);
+    view.questionText = this.createQuestionText(question);
+    view.isMandatory = question.get('IsMandatory');
+    view.domainID = domain.DomainID;
+
+    fieldset.setTitle('<div class="prom-question-intro">Fråga ' + i + ' av ' + numberOfQuestions + '</div><div class="prom-question-title">' + view.questionText + '<span class="hidden">*</span></div>');
+    view.setItemId(columnName);
+
+    var updateMyValue = function () {
+      var value = this.getValue();
+      value = !value ? null : value;
+      if (value instanceof Date) {
+        value = value.toLocaleDateString('sv-SE');
+        value = value.replace(/[^ -~]/g, '');
+      }
+      Current[columnName] = value;
+    };
+
+    var validateMe = function () {
+      if (this.getParent()) {
+        var form = this.up().up();
+        var isValid = form.validate();
+        return isValid;
+      }
+      return true;
+    };
+
+    var config = {
+      itemId: 'question',
+      reference: 'question',
+      labelWrap: true,
+      name: columnName,
+      labelWidth: '60%',
+      labelAlign: 'top'
+    };
+
+    var self = this;
+    if (domain.IsEnumerated) {
+      var store = Ext.create('PublicRegistrator.store.Domain');
+      store.setDomainUrl(view.config.baseUrl, domain.DomainID, view.config.apikey);
+      store.load(function () {self.createSelectQuestion(store, columnName, domain, config, updateMyValue, validateMe, fieldset, question);});
+    } else {
+      var field = this.createField(domain, config, columnName);
+      field.on('change', updateMyValue, field, {});
+      field.on('change', controlFunction, this, {});
+      field.on('change', validateMe, field, {});
+      fieldset.add(field);
+    }
+    Current[columnName] = null;
+    return view;
+  },
+
+  createQuestionText: function (q) {
+    var text;
+    var prefixText = q.get('PrefixText');
+    var suffixText = q.get('SuffixText');
+
+    prefixText = prefixText !== null ? prefixText.trim() : '';
+    suffixText = suffixText !== null ? suffixText.trim() : '';
+
+    if (prefixText) {
+      text = prefixText;
+    } else {
+      var mappedTo = q.get('MappedTo');
+      mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
+      switch (mappedTo) {
+      case 'SubjectKey':
+        text = 'Personnummer';
+        break;
+      case 'UnitCode':
+        text = 'VårdenhetsID';
+        break;
+      case 'EventDate':
+        text = 'Händelsedag';
+        break;
+      default:
+        text = 'Frågetext saknas';
+      }
+    }
+
+    text = suffixText ? text + ' (' + suffixText + ')' : text;
+    return text;
+  },
+
+  createQuestionScripts: function (question) {
+    var controlScript = question.get('ControlScript');
+    var validationScript = question.get('ValidationScript');
+
+    if (controlScript !== null) {
+      if (controlScript.indexOf('Parent') === -1) {
+        var cf = new Function(controlScript); // eslint-disable-line no-new-func
+        controlFunctions.push(cf);
+      }
+    }
+
+    if (validationScript !== null) {
+      if (validationScript.indexOf('Parent') === -1) {
+        var vf = new Function(validationScript); // eslint-disable-line no-new-func
+        validationFunctions.push({
+          columnName: question.get('ColumnName'),
+          validationFunction: vf
+        });
+      }
+    }
+  },
+
+  createField: function (domain, config, columnName) {
+    var fieldType;
+    var fieldConfig = {};
+    switch (domain.DomainID) {
+    case 1015:
+      fieldType = 'Toggle';
+      break;
+    case 1020:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv svar här' };
+      break;
+    case 1021:
+      fieldType = 'TextArea';
+      fieldConfig = { placeholder: 'Skriv svar här' };
+      break;
+    case 1030:
+      fieldType = 'Date';
+      fieldConfig = { value: new Date(), dateFormat: 'Y-m-d' };
+      break;
+    case 1033:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv in tid här (hh:mm)' };
+      break;
+    case 1038:
+      fieldType = 'Number';
+      fieldConfig = { placeholder: 'Skriv in ett årtal', minValue: 1900, value: new Date().getFullYear() };
+      break;
+    case 1040:
+      fieldType = 'Number';
+      fieldConfig = { placeholder: 'Skriv in ett heltal' };
+      break;
+    case 1044:
+      fieldType = 'Field';
+      fieldConfig = { html: this.vas(columnName) };
+      break;
+    case 1050:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv in ett decimaltal' };
+      break;
+    case 1051:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv in ett decimaltal, 1 decimal' };
+      break;
+    case 1052:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv in ett decimaltal, 2 decimaler' };
+      break;
+    case 1053:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv in ett decimaltal, 3 decimaler' };
+      break;
+    case 1080:
+      break;
+    default:
+      fieldType = 'Text';
+      fieldConfig = { placeholder: 'Skriv in ' + domain.DomainTitle };
+      break;
+    }
+    return Ext.create('Ext.field.' + fieldType, Ext.apply(config, fieldConfig));
+  },
+
+  /**
+  *    ##     ##    ###    ##       #### ########     ###    ######## ####  #######  ##    ##
+  *    ##     ##   ## ##   ##        ##  ##     ##   ## ##      ##     ##  ##     ## ###   ##
+  *    ##     ##  ##   ##  ##        ##  ##     ##  ##   ##     ##     ##  ##     ## ####  ##
+  *    ##     ## ##     ## ##        ##  ##     ## ##     ##    ##     ##  ##     ## ## ## ##
+  *     ##   ##  ######### ##        ##  ##     ## #########    ##     ##  ##     ## ##  ####
+  *      ## ##   ##     ## ##        ##  ##     ## ##     ##    ##     ##  ##     ## ##   ###
+  *       ###    ##     ## ######## #### ########  ##     ##    ##    ####  #######  ##    ##
+  */
+
   validate: function () {
     var view = this.getView();
     if (view.isInfo) {
@@ -37,183 +236,6 @@ Ext.define('PublicRegistrator.controller.Question', {
   },
 
   /**
- *    ########  ##     ## #### ##       ########
- *    ##     ## ##     ##  ##  ##       ##     ##
- *    ##     ## ##     ##  ##  ##       ##     ##
- *    ########  ##     ##  ##  ##       ##     ##
- *    ##     ## ##     ##  ##  ##       ##     ##
- *    ##     ## ##     ##  ##  ##       ##     ##
- *    ########   #######  #### ######## ########
- */
-
-  buildQuestion: function (question, i, numberOfQuestions) {
-    var field;
-    var view = this.getView();
-    var fieldset = view.getComponent('fieldset');
-    var questionText = this.buildQuestionText(question);
-    var domain = question.get('Domain');
-    var columnName = question.get('ColumnName');
-
-    fieldset.setTitle('<div class="prom-question-intro">Fråga ' + i + ' av ' + numberOfQuestions + '</div><div class="prom-question-title">' + questionText + '<span class="hidden">*</span></div>');
-    view.questionText = questionText;
-    view.isMandatory = question.get('IsMandatory');
-    view.setItemId(columnName);
-    view.domainID = domain.DomainID;
-    this.addQuestionScripts(question);
-
-    var updateMyValue = function () {
-      var value = this.getValue();
-      value = !value ? null : value;
-      if (value instanceof Date) {
-        value = value.toLocaleDateString('sv-SE');
-        value = value.replace(/[^ -~]/g, '');
-      }
-      Current[columnName] = value;
-    };
-
-    var validateMe = function () {
-      if (this.getParent()) {
-        var form = this.up().up();
-        var isValid = form.validate();
-        return isValid;
-      }
-      return true;
-    };
-
-    var config = {
-      itemId: 'question',
-      reference: 'question',
-      // label: questionText,
-      labelWrap: true,
-      name: columnName,
-      labelWidth: '60%',
-      labelAlign: 'top'
-    };
-    var self = this;
-    if (domain.IsEnumerated) {
-      var store = Ext.create('PublicRegistrator.store.Domain');
-      store.setDomainUrl(view.config.baseUrl, domain.DomainID, view.config.apikey);
-      store.load(function () {self.buildSelectQuestion(store, columnName, domain, config, updateMyValue, validateMe, fieldset, question);});
-    } else {
-      switch (true) {
-      case (domain.DomainID === 1015): // Boolean
-        field = Ext.create('Ext.field.Toggle', config);
-        break;
-      case (domain.DomainID === 1020): // Text
-        field = Ext.create('Ext.field.Text', Ext.apply(config, {placeholder: 'Skriv svar här'}));
-        break;
-      case (domain.DomainID === 1021): // Kommentar
-        field = Ext.create('Ext.field.TextArea', Ext.apply(config, {placeholder: 'Skriv svar här'}));
-        break;
-      case (domain.DomainID === 1030):
-        field = Ext.create('Ext.field.Date', Ext.apply(config, { value: new Date(), dateFormat: 'Y-m-d'
-          // validators: function () { updateMyValue.call(this); return validateMe.call(this); },
-        }));
-        break;
-      case (domain.DomainID === 1033):
-        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in tid här (hh:mm)'}));
-        break;
-      case (domain.DomainID === 1038):
-        field = Ext.create('Ext.field.Number', Ext.apply(config, { placeholder: 'Skriv in ett årtal', minValue: 1900, value: new Date().getFullYear()}));
-        break;
-      case (domain.DomainID === 1040):
-        field = Ext.create('Ext.field.Number', Ext.apply(config, { placeholder: 'Skriv in ett heltal'}));
-        // validators: function (value) { if (this.isBlurring()) { /*updateMyValue.call(f); return validateMe.call(f);*/} else { return true;} }
-        break;
-      case (domain.DomainID === 1050):
-        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal'}));
-        break;
-      case (domain.DomainID === 1051):
-        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 1 decimal'}));
-        break;
-      case (domain.DomainID === 1052):
-        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 2 decimaler'}));
-        break;
-      case (domain.DomainID === 1053):
-        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ett decimaltal, 3 decimaler'}));
-        break;
-      case (domain.DomainID === 1044):
-        field = Ext.create('Ext.field.Field', Ext.apply(config, { html: this.vas(columnName), placeholder: 'Skriv in ett decimaltal, 3 decimaler'}));
-        break;
-      case (domain.DomainID === 1080):
-        break;
-      default:
-        field = Ext.create('Ext.field.Text', Ext.apply(config, { placeholder: 'Skriv in ' + domain.DomainTitle}));
-        break;
-      }
-
-      field.on('change', updateMyValue, field, {});
-      field.on('change', controlFunction, this, {});
-      field.on('change', validateMe, field, {});
-      fieldset.add(field);
-    }
-    Current[columnName] = null;
-    view.add(fieldset);
-    return view;
-  },
-
-  buildQuestionText: function (q) {
-    var text;
-    var mappedTo;
-    var prefixText = q.get('PrefixText');
-    var suffixText = q.get('SuffixText');
-
-    prefixText = prefixText !== null ? prefixText.trim() : '';
-    suffixText = suffixText !== null ? suffixText.trim() : '';
-
-    if (prefixText === '') {
-      mappedTo = q.get('MappedTo');
-      mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
-      switch (mappedTo) {
-      case 'SubjectKey':
-        text = 'Personnummer';
-        break;
-      case 'UnitCode':
-        text = 'VårdenhetsID';
-        break;
-      case 'EventDate':
-        text = 'Händelsedag';
-        break;
-      default:
-        text = 'Frågetext saknas';
-      }
-    } else {
-      text = prefixText;
-    }
-
-    if (suffixText !== '') { text = text + ' (' + suffixText + ')';}
-    return text;
-  },
-
-  addQuestionScripts: function (question) {
-    var controlScript = question.get('ControlScript');
-    var validationScript = question.get('ValidationScript');
-
-    if (controlScript !== null) {
-      if (controlScript.indexOf('Parent') === -1) {
-        var cf = new Function(controlScript); // eslint-disable-line no-new-func
-        controlFunctions.push(cf);
-      }
-    }
-
-    if (validationScript !== null) {
-      if (validationScript.indexOf('Parent') === -1) {
-        var vf = new Function(validationScript); // eslint-disable-line no-new-func
-        validationFunctions.push({
-          columnName: question.get('ColumnName'),
-          validationFunction: vf
-        });
-      }
-    }
-  },
-
-  init: function () {
-    var config = this.getView().config;
-    if (config.isInfo) return;
-    this.buildQuestion(config.questionData, config.index, config.numberOfQuestions, config.meta);
-  },
-
-  /**
  *     ######  ######## ##       ########  ######  ########
  *    ##    ## ##       ##       ##       ##    ##    ##
  *    ##       ##       ##       ##       ##          ##
@@ -223,21 +245,23 @@ Ext.define('PublicRegistrator.controller.Question', {
  *     ######  ######## ######## ########  ######     ##
  */
 
-  buildSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset, question) {
+  createSelectQuestion: function (store, columnName, domain, config, updateMyValue, validateMe, fieldset, question) {
+    var field;
     var Eq5dDomains = [4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 5769, 5770, 5771, 5772, 5773];
     var isDesktop = Ext.os.deviceType === 'Desktop';
     var isEq5d = Eq5dDomains.indexOf(parseInt(domain.DomainID, 10)) !== -1;
+    var cssClasses = isEq5d && !isDesktop ? 'prom-long-answer' : '';
     var isRadioSelect = true || isDesktop || isEq5d;
     var isDropdown = !isRadioSelect;
-    var field;
     var dv = store.getAt(0).getData().DomainValues;
+
     NameMap[columnName] = {};
     if (isRadioSelect) {
-      // fieldset.add(Ext.create('Ext.Label', { html: this.buildQuestionText(question), cls: 'prom-question-label' }));
       field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue: function (value) { this._value = value;}, getValue: function () { return this._value;}, hidden: true});
       fieldset.add(field);
+
       var onRadioclick = function () {
-        var checked = this; // Ext.ComponentQuery.query('#radio').filter(function (radio) {return radio.getChecked();})[0];
+        var checked = this;
         if (checked && checked.getChecked() === field.getValue()) {
           checked.setChecked(false);
           field.setValue(null);
@@ -250,7 +274,7 @@ Ext.define('PublicRegistrator.controller.Question', {
         validationFunction.bind(field)();
         validateMe.bind(field)();
       };
-      var cssClasses = isEq5d && !isDesktop ? 'prom-long-answer' : '';
+
       for (var j = 0; j < dv.length; j++) {
         NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
         if (dv[j].IsActive) {
@@ -266,16 +290,15 @@ Ext.define('PublicRegistrator.controller.Question', {
         }
       }
 
-      fieldset.add(
-        Ext.create('Ext.field.Radio', {
-          name: columnName,
-          cls: cssClasses,
-          boxLabel: 'Kan eller vill inte svara',
-          value: '',
-          itemId: 'radio',
-          listeners: { check: onRadioclick}
-        })
-      );
+      var noAnswerOption = Ext.create('Ext.field.Radio', {
+        name: columnName,
+        cls: cssClasses,
+        boxLabel: 'Kan eller vill inte svara',
+        value: '',
+        itemId: 'radio',
+        listeners: { check: onRadioclick}
+      });
+      fieldset.add(noAnswerOption);
     }
     if (isDropdown) {
       var qOptions = [];

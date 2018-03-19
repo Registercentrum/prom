@@ -29,6 +29,7 @@
           reference: 'toolbar',
           cls: 'prom-nav',
           docked: 'top',
+          hidden: true,
           items: [
             {
               text: 'Föregående',
@@ -54,7 +55,7 @@
             {
               text: 'Nästa',
               reference: 'forwardButton',
-              cls: 'prom-nav-forward',
+              cls: 'prom-nav-forward prom-nav-hidden',
               iconCls: 'x-fa fa-angle-right',
               iconAlign: 'right',
               handler: 'onNavigationForward'

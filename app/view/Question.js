@@ -24,16 +24,16 @@
   controller: 'question',
   items: [
     {
-      xtype: 'fieldset',
-      itemId: 'fieldset',
-      cls: 'prom-question',
-      items: []
-    },
-    {
       xtype: 'label',
       reference: 'validation',
       cls: 'prom-question-validation',
       tpl: '<span class="prom-validation">{validationInfo}</span>'
+    },
+    {
+      xtype: 'fieldset',
+      itemId: 'fieldset',
+      cls: 'prom-question',
+      items: []
     }
   ],
 
