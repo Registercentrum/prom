@@ -349,8 +349,8 @@ Ext.define('PublicRegistrator.controller.Question', {
   vasScaleWithHeaders: function (columnName) {
     var scaleDiv = document.createElement('div');
     scaleDiv.className = 'scaleContainer';
-    scaleDiv.appendChild(this.vasNumbers());
     scaleDiv.appendChild(this.vasScale(columnName));
+    scaleDiv.appendChild(this.vasNumbers());
 
     var scaleWithHeader = document.createElement('div');
     scaleWithHeader.className = 'scaleWithHeader';
