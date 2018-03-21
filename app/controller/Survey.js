@@ -29,7 +29,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.waitForQuestions(this);
   },
 
-  waitForQuestions(self) {
+  waitForQuestions: function (self) {
     if (typeof promQuestions === 'undefined') {
       setTimeout(function () { self.waitForQuestions(self); }, 100);
     } else {
