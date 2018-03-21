@@ -31,14 +31,9 @@ Global.Validate = function () { return;};
 var Current = {}; // lagrar data om det aktiva formuläret
 var NameMap = {};
 var Parent = null; // lagrar data om det aktiva formuläret
-var controlFunctions = [];
+
 var validationFunctions = [];
 
-var controlFunction = function () {
-  for (i = 0; i < controlFunctions.length; ++i) {
-    controlFunctions[i]();
-  }
-};
 var validationFunction = function () {
   for (i = 0; i < validationFunctions.length; ++i) {
     var ret = validationFunctions[i].validationFunction();

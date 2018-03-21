@@ -65,7 +65,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     } else {
       var field = this.createField(domain.DomainID, config, columnName);
       field.on('change', updateMyValue, field, {});
-      field.on('change', controlFunction, this, {});
+      field.on('change', function () { Ext.getCmp('registrationform').fireEvent('control');});
       field.on('change', validateMe, field, {});
       fieldset.add(field);
     }
@@ -89,8 +89,8 @@ Ext.define('PublicRegistrator.controller.Question', {
   createQuestionScripts: function (question) {
     var doControlScript = question.get('ControlScript') && question.get('ControlScript').indexOf('Parent') === -1;
     var doValidationScript = question.get('ValidationScript') && question.get('ValidationScript').indexOf('Parent') === -1;
-
-    doControlScript && controlFunctions.push(new Function(question.get('ControlScript'))); // eslint-disable-line no-new-func
+    var survey = Ext.getCmp('registrationform').up();
+    doControlScript && survey.controlFunctions.push(new Function(question.get('ControlScript'))); // eslint-disable-line no-new-func
     doValidationScript && validationFunctions.push({columnName: question.get('ColumnName'), validationFunction: new Function(question.get('ValidationScript'))}); // eslint-disable-line
   },
 
@@ -194,7 +194,7 @@ Ext.define('PublicRegistrator.controller.Question', {
         }
 
         updateMyValue.bind(field)();
-        controlFunction();
+        Ext.getCmp('registrationform').fireEvent('control');
         validationFunction.bind(field)();
         validateMe.bind(field)();
       };
@@ -247,7 +247,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     }
 
     field.on('change', updateMyValue, field, {});
-    field.on('change', controlFunction, this, {});
+    field.on('change', function () { Ext.getCmp('registrationform').fireEvent('control');});
     field.on('change', validateMe, field, {});
 
     fieldset.add(field);

@@ -8,6 +8,7 @@
   },
   layout: 'fit',
   controller: 'survey',
+  controlFunctions: [],
   items: [
     {
       xtype: 'carousel',
@@ -20,7 +21,7 @@
       direction: 'horizontal',
       indicator: true,
       listeners: {
-        // beforeactiveitemchange: 'beforeNavigation',
+        control: 'controlFunction',
         activeitemchange: 'onNavigation'
       },
       items: [

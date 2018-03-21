@@ -19,6 +19,13 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.initInvitation();
   },
 
+  controlFunction: function () {
+    var view = this.getView();
+    for (var i = 0; i < view.controlFunctions.length; ++i) {
+      view.controlFunctions[i]();
+    }
+  },
+
   initInvitation: function () {
     var self = this;
     self.formStore       = Ext.getStore('Form');
@@ -119,7 +126,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
     });
 
     formView.add(summary);
-    controlFunction();
+    Ext.getCmp('registrationform').fireEvent('control');
     Ext.fly('appLoadingIndicator').destroy();
     Ext.getCmp('ext-viewport').removeCls('hidden');
   },
