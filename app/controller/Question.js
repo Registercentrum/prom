@@ -66,7 +66,7 @@ Ext.define('PublicRegistrator.controller.Question', {
       store.setDomainUrl(view.config.baseUrl, domain.DomainID, view.config.apikey);
       store.load(function () {self.createSelectQuestion(store, columnName, domain, config, updateMyValue, validateMe, fieldset, question);});
     } else {
-      var field = this.createField(domain, config, columnName);
+      var field = this.createField(domain.DomainID, config, columnName);
       field.on('change', updateMyValue, field, {});
       field.on('change', controlFunction, this, {});
       field.on('change', validateMe, field, {});
@@ -130,65 +130,25 @@ Ext.define('PublicRegistrator.controller.Question', {
     }
   },
 
-  createField: function (domain, config, columnName) {
-    var fieldType;
-    var fieldConfig = {};
-    switch (domain.DomainID) {
-    case 1015:
-      fieldType = 'Toggle';
-      break;
-    case 1020:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv svar här' };
-      break;
-    case 1021:
-      fieldType = 'TextArea';
-      fieldConfig = { placeholder: 'Skriv svar här' };
-      break;
-    case 1030:
-      fieldType = 'Date';
-      fieldConfig = { value: new Date(), dateFormat: 'Y-m-d' };
-      break;
-    case 1033:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv in tid här (hh:mm)' };
-      break;
-    case 1038:
-      fieldType = 'Number';
-      fieldConfig = { placeholder: 'Skriv in ett årtal', minValue: 1900, value: new Date().getFullYear() };
-      break;
-    case 1040:
-      fieldType = 'Number';
-      fieldConfig = { placeholder: 'Skriv in ett heltal' };
-      break;
-    case 1044:
-      fieldType = 'Field';
-      fieldConfig = { html: this.vas(columnName) };
-      break;
-    case 1050:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv in ett decimaltal' };
-      break;
-    case 1051:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv in ett decimaltal, 1 decimal' };
-      break;
-    case 1052:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv in ett decimaltal, 2 decimaler' };
-      break;
-    case 1053:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv in ett decimaltal, 3 decimaler' };
-      break;
-    case 1080:
-      break;
-    default:
-      fieldType = 'Text';
-      fieldConfig = { placeholder: 'Skriv in ' + domain.DomainTitle };
-      break;
-    }
-    return Ext.create('Ext.field.' + fieldType, Ext.apply(config, fieldConfig));
+  createField: function (domain, defaultConfig, columnName) {
+    var fields = {
+      1015: { field: 'Toggle', config: { placeholder: 'skriv svar här'}},
+      1020: { field: 'Text', config: { placeholder: 'Skriv svar här'}},
+      1021: { field: 'TextArea', config: { placeholder: 'Skriv svar här'}},
+      1030: { field: 'Date', config: { value: new Date(), dateFormat: 'Y-m-d' }},
+      1033: { field: 'Text', config: { placeholder: 'Skriv in tid här (hh:mm)' }},
+      1038: { field: 'Number', config: { placeholder: 'Skriv in ett årtal', minValue: 1900, value: new Date().getFullYear()}},
+      1040: { field: 'Number', config: { placeholder: 'Skriv in ett heltal' }},
+      1044: { field: 'Field', config: { html: this.vas(columnName) }},
+      1050: { field: 'Text', config: { placeholder: 'Skriv in ett decimaltal' }},
+      1051: { field: 'Text', config: { placeholder: 'Skriv in ett decimaltal, 1 decimal' }},
+      1052: { field: 'Text', config: { placeholder: 'Skriv in ett decimaltal, 2 decimaler' }},
+      1053: { field: 'Text', config: { placeholder: 'Skriv in ett decimaltal, 3 decimaler' }}
+    };
+
+    var type = fields[domain] ? fields[domain].field : 'Text';
+    var config = fields[domain] ? fields[domain].config : 'Skriv svar här';
+    return Ext.create('Ext.field.' + type, Ext.apply(defaultConfig, config));
   },
 
   /**

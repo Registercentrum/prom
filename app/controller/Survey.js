@@ -26,10 +26,21 @@ Ext.define('PublicRegistrator.controller.Survey', {
     self.questionStore   = Ext.getStore('Question');
     self.domainStore     = Ext.getStore('Domain');
     self.invitationStore = Ext.getStore('Invitation');
-    self.invitationStore.setUrlByToken(this.config.baseUrl, this.config.token, this.config.apikey);
-    self.invitationStore.load(function () {
-      callback(self);
-    });
+    // self.invitationStore.setUrlByToken(this.config.baseUrl, this.config.token, this.config.apikey);
+    // self.invitationStore.load(function () {
+    //  callback(self);
+    // });
+    this.waitForQuestions(this);
+  },
+
+  waitForQuestions(self) {
+    if (typeof Global.promQuestions === 'undefined') {
+      setTimeout(function () { self.waitForQuestions(self); }, 100);
+    } else {
+      var result = Ext.decode(Global.promQuestions);
+      self.invitationStore.loadRawData(result);
+      self.initForm(this);
+    }
   },
 
   initDefaultConfigs: function () {
