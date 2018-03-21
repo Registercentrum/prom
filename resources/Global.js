@@ -1,4 +1,5 @@
 ﻿var Global = Global ? Global : {};
+var promQuestions;
 Global.Validate = function () { return;};
 (function () {
   var getParameterByName = function (name) {
@@ -19,7 +20,7 @@ Global.Validate = function () { return;};
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
       if (this.readyState === 4 && this.status === 200) {
-        Global.promQuestions = this.responseText;
+        promQuestions = this.responseText;
       }
     };
     xhttp.open('GET', '//' + baseURL + '/api/proxies/survey?token=' + token + '&apikey=' + apikey, true);

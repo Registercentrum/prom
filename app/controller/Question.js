@@ -54,10 +54,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var config = {
       itemId: 'question',
       reference: 'question',
-      labelWrap: true,
-      name: columnName,
-      labelWidth: '60%',
-      labelAlign: 'top'
+      name: columnName
     };
 
     var self = this;
@@ -77,57 +74,24 @@ Ext.define('PublicRegistrator.controller.Question', {
   },
 
   createQuestionText: function (q) {
-    var text;
-    var prefixText = q.get('PrefixText');
-    var suffixText = q.get('SuffixText');
+    var prefixText = q.get('PrefixText') ? q.get('PrefixText').trim() : '';
+    var suffixText = q.get('SuffixText') ? q.get('SuffixText').trim() : '';
 
-    prefixText = prefixText !== null ? prefixText.trim() : '';
-    suffixText = suffixText !== null ? suffixText.trim() : '';
-
-    if (prefixText) {
-      text = prefixText;
-    } else {
-      var mappedTo = q.get('MappedTo');
-      mappedTo = typeof mappedTo !== 'undefined' ? mappedTo.trim() : '';
-      switch (mappedTo) {
-      case 'SubjectKey':
-        text = 'Personnummer';
-        break;
-      case 'UnitCode':
-        text = 'VårdenhetsID';
-        break;
-      case 'EventDate':
-        text = 'Händelsedag';
-        break;
-      default:
-        text = 'Frågetext saknas';
-      }
+    if (!prefixText) {
+      var mappedTo = q.get('MappedTo') ? q.get('MappedTo').trim() : '';
+      var texts = { 'SubjectKey': 'Personnummer', 'UnitCode': 'VårdenhetsID', 'EventDate': 'Händelsedag'};
+      prefixText = texts[mappedTo] ? texts[mappedTo] : 'Frågetext saknas';
     }
 
-    text = suffixText ? text + ' (' + suffixText + ')' : text;
-    return text;
+    return suffixText ? prefixText + ' (' + suffixText + ')' : prefixText;
   },
 
   createQuestionScripts: function (question) {
-    var controlScript = question.get('ControlScript');
-    var validationScript = question.get('ValidationScript');
+    var doControlScript = question.get('ControlScript') && question.get('ControlScript').indexOf('Parent') === -1;
+    var doValidationScript = question.get('ValidationScript') && question.get('ValidationScript').indexOf('Parent') === -1;
 
-    if (controlScript !== null) {
-      if (controlScript.indexOf('Parent') === -1) {
-        var cf = new Function(controlScript); // eslint-disable-line no-new-func
-        controlFunctions.push(cf);
-      }
-    }
-
-    if (validationScript !== null) {
-      if (validationScript.indexOf('Parent') === -1) {
-        var vf = new Function(validationScript); // eslint-disable-line no-new-func
-        validationFunctions.push({
-          columnName: question.get('ColumnName'),
-          validationFunction: vf
-        });
-      }
-    }
+    doControlScript && controlFunctions.push(new Function(question.get('ControlScript'))); // eslint-disable-line no-new-func
+    doValidationScript && validationFunctions.push({columnName: question.get('ColumnName'), validationFunction: new Function(question.get('ValidationScript'))}); // eslint-disable-line
   },
 
   createField: function (domain, defaultConfig, columnName) {

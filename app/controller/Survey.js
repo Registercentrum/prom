@@ -16,28 +16,24 @@ Ext.define('PublicRegistrator.controller.Survey', {
     this.config = this.getView().config;
     this.initDefaultConfigs();
     this.initDefaultValidations();
-    this.initInvitation(this.initForm);
+    this.initInvitation();
   },
 
-  initInvitation: function (callback) {
+  initInvitation: function () {
     var self = this;
     self.formStore       = Ext.getStore('Form');
     self.unitStore       = Ext.getStore('Unit');
     self.questionStore   = Ext.getStore('Question');
     self.domainStore     = Ext.getStore('Domain');
     self.invitationStore = Ext.getStore('Invitation');
-    // self.invitationStore.setUrlByToken(this.config.baseUrl, this.config.token, this.config.apikey);
-    // self.invitationStore.load(function () {
-    //  callback(self);
-    // });
     this.waitForQuestions(this);
   },
 
   waitForQuestions(self) {
-    if (typeof Global.promQuestions === 'undefined') {
+    if (typeof promQuestions === 'undefined') {
       setTimeout(function () { self.waitForQuestions(self); }, 100);
     } else {
-      var result = Ext.decode(Global.promQuestions);
+      var result = Ext.decode(promQuestions);
       self.invitationStore.loadRawData(result);
       self.initForm(this);
     }
@@ -46,6 +42,9 @@ Ext.define('PublicRegistrator.controller.Survey', {
   initDefaultConfigs: function () {
     Ext.util.Format.decimalSeparator = ',';
     Ext.apply(Ext.picker.Date.prototype.defaultConfig, {cancelButton: 'Avbryt', doneButton: 'Klar'});
+    Ext.apply(Ext.panel.Date.prototype.defaultConfig, {startDay: 1});
+    Ext.Date.monthNames = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
+    Ext.Date.dayNames = [ 'Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
   },
 
   initDefaultValidations: function () {
