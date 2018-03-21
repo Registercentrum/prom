@@ -42,7 +42,7 @@ Ext.define('PublicRegistrator.controller.Survey', {
   initDefaultConfigs: function () {
     Ext.util.Format.decimalSeparator = ',';
     Ext.apply(Ext.picker.Date.prototype.defaultConfig, {cancelButton: 'Avbryt', doneButton: 'Klar'});
-    Ext.apply(Ext.panel.Date.prototype.defaultConfig, {startDay: 1});
+    Ext.apply(Ext.panel.Date.prototype.defaultConfig, {startDay: 1, prevText: 'Förra månaden', nextText: 'Nästa månad'});
     Ext.Date.monthNames = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
     Ext.Date.dayNames = [ 'Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
   },
