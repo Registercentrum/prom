@@ -9,6 +9,7 @@
   layout: 'fit',
   controller: 'survey',
   controlFunctions: [],
+  domains: [],
   items: [
     {
       xtype: 'carousel',

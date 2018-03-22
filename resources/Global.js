@@ -1,8 +1,9 @@
 ﻿/* eslint-disable no-unused-vars */
+
+// Global variables
 var Global = Global ? Global : {};
-var Prom = {};
+var Prom;
 var Current = {};
-var NameMap = {};
 var Parent =  null;
 
 Global.Validate = function () { return;};
@@ -12,6 +13,7 @@ var assignIf = function (condition, name, value) {
   if (condition) {
     var question = Ext.getCmp('registrationform').down('#' + name).down('#question');
     question && question.setValue(value);
+    Current[name] = value;
   }
 };
 

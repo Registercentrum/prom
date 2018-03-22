@@ -178,8 +178,9 @@ Ext.define('PublicRegistrator.controller.Question', {
     var isRadioSelect = true || isDesktop || isEq5d;
     var isDropdown = !isRadioSelect;
     var dv = store.getAt(0).getData().DomainValues;
+    var domains = Ext.getCmp('registrationform').up().domains;
 
-    NameMap[columnName] = {};
+    domains[columnName] = {};
     if (isRadioSelect) {
       field = Ext.create('Ext.Component', {_value: '', reference: 'question', itemId: 'question', getName: function () { return columnName; }, setValue: function (value) { this._value = value;}, getValue: function () { return this._value;}, hidden: true});
       fieldset.add(field);
@@ -199,7 +200,7 @@ Ext.define('PublicRegistrator.controller.Question', {
       };
 
       for (var j = 0; j < dv.length; j++) {
-        NameMap[columnName][dv[j].ValueCode] = dv[j].ValueName;
+        domains[columnName][dv[j].ValueCode] = dv[j].ValueName;
         if (dv[j].IsActive) {
           var radio = Ext.create('Ext.field.Radio', {
             cls: cssClasses,
@@ -226,7 +227,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     if (isDropdown) {
       var qOptions = [];
       for (var k = 0; k < dv.length; k++) {
-        NameMap[columnName][dv[k].ValueCode] = dv[k].ValueName;
+        domains[columnName][dv[k].ValueCode] = dv[k].ValueName;
         if (dv[k].IsActive) {
           qOptions.push({
             text: dv[k].ValueName,

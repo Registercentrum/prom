@@ -365,7 +365,8 @@ Ext.define('PublicRegistrator.controller.Survey', {
   */
 
   updateSummaryItem: function (name, value) {
-    var answer = (value !== null && typeof NameMap[name] !== 'undefined') ? NameMap[name][value] : value;
+    var domains = Ext.getCmp('registrationform').up().domains;
+    var answer = (value !== null && typeof domains[name] !== 'undefined') ? domains[name][value] : value;
     answer = answer ? answer : 'Inget svar har angetts';
 
     var survey = this.lookup('regform');
