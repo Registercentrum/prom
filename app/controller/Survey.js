@@ -37,10 +37,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
   },
 
   waitForQuestions: function (self) {
-    if (typeof promQuestions === 'undefined') {
+    if (typeof Prom === 'undefined') {
       setTimeout(function () { self.waitForQuestions(self); }, 100);
     } else {
-      var result = Ext.decode(promQuestions);
+      var result = Ext.decode(Prom);
       self.invitationStore.loadRawData(result);
       self.initForm(this);
     }
@@ -317,8 +317,10 @@ Ext.define('PublicRegistrator.controller.Survey', {
     var survey = this.lookup('regform');
     var questions = Ext.ComponentQuery.query('#question');
     var submitButton = this.lookup('submitButton');
-
     for (var i = 0; i < questions.length; i++) {
+      questions[i].up().up().validate();
+    }
+    for (i = 0; i < questions.length; i++) {
       if (!questions[i].up().up().isValid) {
         submitButton.setDisabled(true);
         survey.isValid = false;

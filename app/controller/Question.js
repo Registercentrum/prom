@@ -91,7 +91,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var doValidationScript = question.get('ValidationScript') && question.get('ValidationScript').indexOf('Parent') === -1;
     var survey = Ext.getCmp('registrationform').up();
     doControlScript && survey.controlFunctions.push(new Function(question.get('ControlScript'))); // eslint-disable-line no-new-func
-    doValidationScript && validationFunctions.push({columnName: question.get('ColumnName'), validationFunction: new Function(question.get('ValidationScript'))}); // eslint-disable-line
+    this.validateByScript = doValidationScript ? new Function(question.get('ValidationScript')) : this.validateByScript; // eslint-disable-line
   },
 
   createField: function (domain, defaultConfig, columnName) {
@@ -134,8 +134,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     var fieldName = this.lookup('question').getName();
     view.validationMessage = null;
     view.mandatoryMessage = view.isMandatory && !Current[fieldName] ? 'OBS! Denna fråga måste besvaras.' : null;
-
-    validationFunction(); // Registry specific validation scripts from database
+    view.validationMessage = this.validateByScript() === true ? null : this.validateByScript();
 
     if (view.validationMessage === null) {
       var validationMessage = Global.Validate(Current[fieldName], view.domainID); // eslint-disable-line new-cap
@@ -159,6 +158,7 @@ Ext.define('PublicRegistrator.controller.Question', {
     view.isValid || !view.showValidation ? field.removeCls('x-invalid') : field.addCls('x-invalid');
   },
 
+  validateByScript: function () { return null;},
   /**
  *     ######  ######## ##       ########  ######  ########
  *    ##    ## ##       ##       ##       ##    ##    ##
@@ -195,7 +195,6 @@ Ext.define('PublicRegistrator.controller.Question', {
 
         updateMyValue.bind(field)();
         Ext.getCmp('registrationform').fireEvent('control');
-        validationFunction.bind(field)();
         validateMe.bind(field)();
       };
 
